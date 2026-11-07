@@ -6,3 +6,4 @@ dist/
 coverage/
 *.zip
 apps/api/probe-reports/
+*.tsbuildinfo
