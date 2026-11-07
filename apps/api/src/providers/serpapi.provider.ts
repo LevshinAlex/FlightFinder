@@ -3,7 +3,7 @@ import {
   FlightProvider, ProviderCapabilities, ProviderNotSupportedError, ProviderOffer, ProviderRequestError,
   ProviderStatus, SearchCriteria,
 } from './flight-provider.interface';
-import { resolveGoogleRoundTrip } from './google-flights';
+import { outboundOnlyOffers, resolveGoogleRoundTrip } from './google-flights';
 import { providerFetch } from './http';
 
 /**
@@ -51,6 +51,11 @@ export class SerpApiProvider implements FlightProvider {
 
   searchFlights(c: SearchCriteria): Promise<ProviderOffer[]> {
     return resolveGoogleRoundTrip(this.name, c, (token) => this.page(c, token));
+  }
+
+  /** 1 request: outbound legs + round-trip "from" prices, no return legs (rankingOnly). */
+  async searchOutboundOnly(c: SearchCriteria): Promise<ProviderOffer[]> {
+    return outboundOnlyOffers(this.name, c, await this.page(c));
   }
 
   async getIndicativePrices(): Promise<ProviderOffer[]> {

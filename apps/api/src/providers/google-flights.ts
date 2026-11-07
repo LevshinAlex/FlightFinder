@@ -94,3 +94,35 @@ export async function resolveGoogleRoundTrip(
       };
     });
 }
+
+/**
+ * Offers from the FIRST page only (1 request): real outbound legs + Google's "from" round-trip
+ * price, but no return legs. `rankingOnly` – inbound stops are unknown, so these are never stored;
+ * used by the provider probe to check coverage and prices on a 1-request budget.
+ */
+export function outboundOnlyOffers(provider: string, c: SearchCriteria, json: any): ProviderOffer[] {
+  const observedAt = new Date().toISOString();
+  return items(json)
+    .filter((i) => num(i.price) !== undefined)
+    .map((i): ProviderOffer => {
+      const outSegs = mapLegs(i.flights);
+      return {
+        provider,
+        origin: outSegs[0]?.from ?? c.origin,
+        destination: outSegs[outSegs.length - 1]?.to ?? c.destination,
+        departureDate: c.departureDate,
+        returnDate: c.returnDate,
+        airline: [...new Set(outSegs.map((s) => s.carrier).filter(Boolean))].join(', ') || undefined,
+        outboundStops: Math.max(0, outSegs.length - 1),
+        inboundStops: 0, // unknown (needs the return page) – offer is rankingOnly
+        outboundDurationMin: num(i.total_duration ?? i.totalDuration),
+        segments: { outbound: outSegs, inbound: [] },
+        price: Number(i.price),
+        currency: c.currency.toUpperCase(),
+        selfTransfer: looksSelfTransfer(i),
+        priceStatus: 'LIVE',
+        rankingOnly: true,
+        observedAt,
+      };
+    });
+}
