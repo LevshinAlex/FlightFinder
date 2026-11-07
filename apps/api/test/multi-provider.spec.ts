@@ -175,3 +175,24 @@ describe('Control check', () => {
     expect(compareControl('serpapi', crit, primary, { ok: false, error: 'HTTP 503' })).toMatchObject({ status: 'FAILED', error: 'HTTP 503' });
   });
 });
+
+import { selectLiveCandidates } from '../src/search/search-planner';
+
+describe('LIVE_AIRPORT_PROBES=false → fixed budget', () => {
+  const plan: TrackerSearchPlan = {
+    trackerId: 't', origin: 'TLV', destinations: ['FCO', 'MXP', 'VCE', 'NAP'], adults: 1, cabinClass: 'ECONOMY', currency: 'ILS', maxStops: 1,
+    combinations: [{ departureDate: '2027-05-10', returnDate: '2027-05-20' }, { departureDate: '2027-05-11', returnDate: '2027-05-20' }],
+  };
+  const ind = ['FCO', 'MXP', 'VCE', 'NAP'].map((d, i) => offer({ destination: d, price: 1000 + i, priceStatus: 'INDICATIVE' }));
+
+  it('with probes: top-N + one per airport', () => {
+    expect(selectLiveCandidates(plan, ind, 2)).toHaveLength(4);
+  });
+  it('without probes: exactly top-N', () => {
+    expect(selectLiveCandidates(plan, ind, 2, false).map((c) => c.destination)).toEqual(['FCO', 'MXP']);
+  });
+  it('without probes and no indicative data: N middle-date checks', () => {
+    const c = selectLiveCandidates(plan, [], 2, false);
+    expect(c.map((x) => `${x.destination}:${x.departureDate}`)).toEqual(['FCO:2027-05-11', 'MXP:2027-05-11']);
+  });
+});

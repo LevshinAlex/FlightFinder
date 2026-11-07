@@ -138,8 +138,10 @@ export class SearchEngineService {
       const ind = this.indicativeFor(p, indicative);
       const candidates = liveProvider
         ? indicativeProvider
-          ? selectLiveCandidates(p, ind, config.providers.liveCheckTopN)
-          : allCriteria(p).slice(0, config.providers.liveCheckTopN * 3) // no stage 1: bounded brute force
+          ? selectLiveCandidates(p, ind, config.providers.liveCheckTopN, config.providers.liveAirportProbes)
+          : config.providers.liveAirportProbes
+            ? allCriteria(p).slice(0, config.providers.liveCheckTopN * 3) // no stage 1: bounded brute force
+            : selectLiveCandidates(p, [], config.providers.liveCheckTopN, false) // fixed budget: N middle-date checks
         : [];
       candidatesByTracker.set(p.trackerId, candidates);
     }

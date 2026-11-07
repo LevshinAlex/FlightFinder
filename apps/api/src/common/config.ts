@@ -18,6 +18,8 @@ export const config = {
     /** Optional independent provider that re-checks the cheapest live result of each tracker. */
     control: process.env.CONTROL_PROVIDER ?? '',
     liveCheckTopN: num(process.env.LIVE_CHECK_TOP_N, 10),
+    /** false → live-check only the top-N (no extra probe per destination airport) */
+    liveAirportProbes: process.env.LIVE_AIRPORT_PROBES !== 'false',
     concurrency: num(process.env.PROVIDER_CONCURRENCY, 4),
     cacheTtlMin: num(process.env.SEARCH_CACHE_TTL_MINUTES, 180),
     travelpayoutsToken: process.env.TRAVELPAYOUTS_TOKEN ?? '',

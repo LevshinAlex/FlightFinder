@@ -73,8 +73,9 @@ export function cheapestPerRoute(offers: ProviderOffer[]): Map<string, ProviderO
  * Stage 2 selection: top-N cheapest indicative combinations PLUS quality control –
  * the cheapest combo of every airport and one probe for airports without any
  * indicative data (indicative caches are incomplete).
+ * `airportProbes: false` keeps only the top-N – a fixed, predictable live budget per tracker.
  */
-export function selectLiveCandidates(plan: TrackerSearchPlan, indicative: ProviderOffer[], topN: number): SearchCriteria[] {
+export function selectLiveCandidates(plan: TrackerSearchPlan, indicative: ProviderOffer[], topN: number, airportProbes = true): SearchCriteria[] {
   const criteria = allCriteria(plan);
   const byKey = new Map(criteria.map((c) => [`${c.destination}|${c.departureDate}|${c.returnDate}`, c]));
   const ranked = [...cheapestPerRoute(filterOffers(indicative, plan.maxStops, plan.currency)).values()].sort((a, b) => a.price - b.price);
@@ -87,6 +88,14 @@ export function selectLiveCandidates(plan: TrackerSearchPlan, indicative: Provid
   };
 
   ranked.slice(0, topN).forEach((o) => pick(o.destination, o.departureDate, o.returnDate));
+  if (!airportProbes) {
+    // no usable indicative data at all: still check something – middle dates of the first airports
+    if (!chosen.size) {
+      const mid = plan.combinations[Math.floor(plan.combinations.length / 2)];
+      if (mid) for (const d of plan.destinations.slice(0, topN)) pick(d, mid.departureDate, mid.returnDate);
+    }
+    return [...chosen.values()];
+  }
 
   const seenAirports = new Set<string>();
   for (const o of ranked) {
