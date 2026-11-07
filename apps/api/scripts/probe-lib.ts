@@ -10,6 +10,7 @@ export const WATCHED_CARRIERS: Record<string, { name: string; group: 'israeli' |
   LY: { name: 'El Al', group: 'israeli' },
   IZ: { name: 'Arkia', group: 'israeli' },
   '6H': { name: 'Israir', group: 'israeli' },
+  BZ: { name: 'Blue Bird Airways', group: 'israeli' },
   W6: { name: 'Wizz Air', group: 'lowcost' },
   W4: { name: 'Wizz Air Malta', group: 'lowcost' },
   W9: { name: 'Wizz Air UK', group: 'lowcost' },

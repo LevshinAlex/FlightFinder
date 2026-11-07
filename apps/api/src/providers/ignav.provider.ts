@@ -3,6 +3,7 @@ import {
   FlightProvider, FlightSegment, IndicativeCriteria, ProviderCapabilities, ProviderNotSupportedError, ProviderOffer,
   ProviderRequestError, ProviderStatus, SearchCriteria,
 } from './flight-provider.interface';
+import { carrierName } from './airlines';
 import { providerFetch } from './http';
 
 /**
@@ -56,7 +57,7 @@ export class IgnavProvider implements FlightProvider {
     return (leg?.segments ?? []).map((s: any) => ({
       from: s.departure_airport, to: s.arrival_airport,
       departAt: s.departure_time_utc ?? s.departure_time_local, arriveAt: s.arrival_time_utc ?? s.arrival_time_local,
-      carrier: s.operating_carrier_name, flightNumber: `${s.marketing_carrier_code ?? ''}${s.flight_number ?? ''}`,
+      carrier: carrierName(s.marketing_carrier_code, s.operating_carrier_name), flightNumber: `${s.marketing_carrier_code ?? ''}${s.flight_number ?? ''}`,
     }));
   }
 
@@ -139,7 +140,7 @@ export class IgnavProvider implements FlightProvider {
           destination: outSegs[outSegs.length - 1]?.to ?? c.destination,
           departureDate: c.departureDate,
           returnDate: c.returnDate,
-          airline: [i.outbound?.carrier, i.inbound?.carrier].filter(Boolean).filter((v, k, a) => a.indexOf(v) === k).join(', ') || undefined,
+          airline: [...new Set([...outSegs, ...inSegs].map((s) => s.carrier).filter(Boolean))].join(', ') || undefined,
           outboundStops: Math.max(0, outSegs.length - 1),
           inboundStops: Math.max(0, inSegs.length - 1),
           outboundDurationMin: i.outbound?.duration_minutes,

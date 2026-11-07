@@ -170,3 +170,30 @@ describe('Ignav', () => {
     expect(JSON.parse(String(calls[0].init?.body))).toEqual({ ignav_id: 'ig-1' });
   });
 });
+
+import { carrierName } from '../src/providers/airlines';
+
+describe('carrier names', () => {
+  it('Latin provider names are kept; Hebrew ones replaced from the directory; unknown → code', () => {
+    expect(carrierName('LY', 'El Al Israel Airlines')).toBe('El Al Israel Airlines');
+    expect(carrierName('LY', 'אל על')).toBe('El Al');
+    expect(carrierName('6H', 'ישראייר')).toBe('Israir');
+    expect(carrierName('ZZ', 'חברה')).toBe('ZZ');
+    expect(carrierName(undefined, undefined)).toBeUndefined();
+  });
+
+  it('Ignav market IL: Hebrew carrier names become English in segments and airline', async () => {
+    config.providers.ignavKey = 'ig-key';
+    const seg = (from: string, to: string, code: string, n: string, name: string) => ({
+      marketing_carrier_code: code, flight_number: n, operating_carrier_name: name, departure_airport: from, arrival_airport: to,
+    });
+    global.fetch = jest.fn(async () => new Response(JSON.stringify({ itineraries: [{
+      price: { amount: 884, currency: 'ILS', status: 'verified' },
+      outbound: { carrier: 'אל על', segments: [seg('TLV', 'FCO', 'LY', '383', 'אל על')] },
+      inbound: { carrier: 'אל על', segments: [seg('FCO', 'TLV', 'LY', '386', 'אל על')] },
+    }] }), { status: 200 })) as any;
+    const [o] = await new IgnavProvider().searchFlights(criteria);
+    expect(o.airline).toBe('El Al');
+    expect(o.segments!.outbound[0].carrier).toBe('El Al');
+  });
+});
