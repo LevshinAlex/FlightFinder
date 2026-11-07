@@ -7,7 +7,8 @@ dotenv.config({ path: [path.resolve(process.cwd(), '.env'), path.resolve(__dirna
 const num = (v: string | undefined, d: number) => (v && !isNaN(Number(v)) ? Number(v) : d);
 
 export const config = {
-  port: num(process.env.API_PORT, 4000),
+  // API_PORT locally; PORT is what PaaS hosts (Render, Railway, …) assign
+  port: num(process.env.API_PORT ?? process.env.PORT, 4000),
   webUrl: process.env.WEB_URL ?? 'http://localhost:3000',
   jwtSecret: process.env.JWT_SECRET ?? 'dev-secret-change-me',
   redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',

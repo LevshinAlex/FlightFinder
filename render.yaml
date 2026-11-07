@@ -1,0 +1,54 @@
+# Render Blueprint – API + in-process worker + Redis (Key Value) on free plans.
+# Render dashboard → New → Blueprint → pick this repo. Values marked `sync: false` are asked for on creation.
+# Database: free Postgres from neon.tech (Render's free Postgres expires after 30 days).
+# The web app stays on Vercel; set its API_INTERNAL_URL to this service's URL. Full guide: docs/DEPLOY.md
+services:
+  - type: web
+    name: llb-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    # devDependencies (tsc, prisma CLI) are needed to build although NODE_ENV=production
+    buildCommand: npm ci --include=dev && npm run build -w apps/api
+    startCommand: cd apps/api && npx prisma migrate deploy && node dist/main.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: RUN_WORKER          # one free instance: scheduler + queues inside the API process
+        value: "true"
+      - key: TRUST_PROXY         # client → Vercel → Render proxy → app
+        value: "2"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: llb-redis
+          property: connectionString
+      - key: DATABASE_URL        # Neon "direct" connection string, …?sslmode=require
+        sync: false
+      - key: WEB_URL             # e.g. https://llb-flights.vercel.app
+        sync: false
+      - key: INDICATIVE_PROVIDER
+        value: mock
+      - key: LIVE_PROVIDER
+        value: mock
+      - key: CONTROL_PROVIDER
+        value: ""
+      - key: LIVE_CHECK_TOP_N
+        value: "3"
+      - key: LIVE_AIRPORT_PROBES
+        value: "false"
+      - key: EMAIL_TRANSPORT
+        value: console
+
+  - type: keyvalue
+    name: llb-redis
+    plan: free
+    region: frankfurt
+    maxmemoryPolicy: noeviction   # required by BullMQ
+    ipAllowList: []               # internal connections only
