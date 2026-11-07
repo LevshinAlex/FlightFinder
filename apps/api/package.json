@@ -12,7 +12,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
-    "demo:history": "ts-node --transpile-only scripts/backfill-demo-history.ts"
+    "demo:history": "ts-node --transpile-only scripts/backfill-demo-history.ts",
+    "probe": "ts-node --transpile-only scripts/probe-providers.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "10.2.3",
