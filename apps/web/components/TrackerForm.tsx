@@ -52,7 +52,9 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
   const origin = countries.find((c) => c.code === v.originCountry);
   const dest = countries.find((c) => c.code === v.destinationCountry);
   const sorted = useMemo(() => [...countries].sort((a, b) => a.name[locale].localeCompare(b.name[locale], locale)), [countries, locale]);
-  const filtered = sorted.filter((c) => !q || c.name.en.toLowerCase().includes(q.toLowerCase()) || c.name.ru.toLowerCase().includes(q.toLowerCase()) || c.code === q.toUpperCase());
+  // The selected country always stays in the list: otherwise the controlled <select required>
+  // has no matching option, the DOM value becomes '' and the browser silently blocks submit.
+  const filtered = sorted.filter((c) => c.code === v.destinationCountry || !q || c.name.en.toLowerCase().includes(q.toLowerCase()) || c.name.ru.toLowerCase().includes(q.toLowerCase()) || c.code === q.toUpperCase());
 
   const combos = useMemo(() => {
     if (!v.departureDate || !v.returnDate) return 0;
@@ -83,7 +85,10 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
         <label className="field">{t.originCountry}
           <select value={v.originCountry} onChange={(e) => {
             const c = countries.find((x) => x.code === e.target.value);
-            setV((s) => ({ ...s, originCountry: e.target.value, originAirport: c?.airports[0]?.iata ?? '' }));
+            setV((s) => ({
+              ...s, originCountry: e.target.value, originAirport: c?.airports[0]?.iata ?? '',
+              ...(s.destinationCountry === e.target.value ? { destinationCountry: '', destinationAirports: [] } : {}),
+            }));
           }}>
             {sorted.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.name[locale]}</option>)}
           </select>
