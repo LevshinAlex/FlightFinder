@@ -1,0 +1,1576 @@
+[
+ {
+  "code": "AL",
+  "name": {
+   "en": "Albania",
+   "ru": "Албания"
+  },
+  "airports": [
+   {
+    "iata": "TIA",
+    "city": {
+     "en": "Tirana",
+     "ru": "Тирана"
+    },
+    "name": "Mother Teresa"
+   }
+  ]
+ },
+ {
+  "code": "AT",
+  "name": {
+   "en": "Austria",
+   "ru": "Австрия"
+  },
+  "airports": [
+   {
+    "iata": "VIE",
+    "city": {
+     "en": "Vienna",
+     "ru": "Вена"
+    },
+    "name": "Schwechat"
+   },
+   {
+    "iata": "SZG",
+    "city": {
+     "en": "Salzburg",
+     "ru": "Зальцбург"
+    },
+    "name": "W. A. Mozart"
+   },
+   {
+    "iata": "INN",
+    "city": {
+     "en": "Innsbruck",
+     "ru": "Инсбрук"
+    },
+    "name": "Kranebitten"
+   }
+  ]
+ },
+ {
+  "code": "BE",
+  "name": {
+   "en": "Belgium",
+   "ru": "Бельгия"
+  },
+  "airports": [
+   {
+    "iata": "BRU",
+    "city": {
+     "en": "Brussels",
+     "ru": "Брюссель"
+    },
+    "name": "Brussels"
+   },
+   {
+    "iata": "CRL",
+    "city": {
+     "en": "Charleroi",
+     "ru": "Шарлеруа"
+    },
+    "name": "Brussels South"
+   }
+  ]
+ },
+ {
+  "code": "BG",
+  "name": {
+   "en": "Bulgaria",
+   "ru": "Болгария"
+  },
+  "airports": [
+   {
+    "iata": "SOF",
+    "city": {
+     "en": "Sofia",
+     "ru": "София"
+    },
+    "name": "Sofia"
+   },
+   {
+    "iata": "VAR",
+    "city": {
+     "en": "Varna",
+     "ru": "Варна"
+    },
+    "name": "Varna"
+   },
+   {
+    "iata": "BOJ",
+    "city": {
+     "en": "Burgas",
+     "ru": "Бургас"
+    },
+    "name": "Burgas"
+   }
+  ]
+ },
+ {
+  "code": "HR",
+  "name": {
+   "en": "Croatia",
+   "ru": "Хорватия"
+  },
+  "airports": [
+   {
+    "iata": "ZAG",
+    "city": {
+     "en": "Zagreb",
+     "ru": "Загреб"
+    },
+    "name": "Franjo Tuđman"
+   },
+   {
+    "iata": "SPU",
+    "city": {
+     "en": "Split",
+     "ru": "Сплит"
+    },
+    "name": "Split"
+   },
+   {
+    "iata": "DBV",
+    "city": {
+     "en": "Dubrovnik",
+     "ru": "Дубровник"
+    },
+    "name": "Dubrovnik"
+   }
+  ]
+ },
+ {
+  "code": "CY",
+  "name": {
+   "en": "Cyprus",
+   "ru": "Кипр"
+  },
+  "airports": [
+   {
+    "iata": "LCA",
+    "city": {
+     "en": "Larnaca",
+     "ru": "Ларнака"
+    },
+    "name": "Larnaca"
+   },
+   {
+    "iata": "PFO",
+    "city": {
+     "en": "Paphos",
+     "ru": "Пафос"
+    },
+    "name": "Paphos"
+   }
+  ]
+ },
+ {
+  "code": "CZ",
+  "name": {
+   "en": "Czech Republic",
+   "ru": "Чехия"
+  },
+  "airports": [
+   {
+    "iata": "PRG",
+    "city": {
+     "en": "Prague",
+     "ru": "Прага"
+    },
+    "name": "Václav Havel"
+   }
+  ]
+ },
+ {
+  "code": "DK",
+  "name": {
+   "en": "Denmark",
+   "ru": "Дания"
+  },
+  "airports": [
+   {
+    "iata": "CPH",
+    "city": {
+     "en": "Copenhagen",
+     "ru": "Копенгаген"
+    },
+    "name": "Kastrup"
+   },
+   {
+    "iata": "BLL",
+    "city": {
+     "en": "Billund",
+     "ru": "Биллунн"
+    },
+    "name": "Billund"
+   }
+  ]
+ },
+ {
+  "code": "EG",
+  "name": {
+   "en": "Egypt",
+   "ru": "Египет"
+  },
+  "airports": [
+   {
+    "iata": "CAI",
+    "city": {
+     "en": "Cairo",
+     "ru": "Каир"
+    },
+    "name": "Cairo"
+   },
+   {
+    "iata": "SSH",
+    "city": {
+     "en": "Sharm el-Sheikh",
+     "ru": "Шарм-эш-Шейх"
+    },
+    "name": "Sharm el-Sheikh"
+   },
+   {
+    "iata": "HRG",
+    "city": {
+     "en": "Hurghada",
+     "ru": "Хургада"
+    },
+    "name": "Hurghada"
+   }
+  ]
+ },
+ {
+  "code": "FR",
+  "name": {
+   "en": "France",
+   "ru": "Франция"
+  },
+  "airports": [
+   {
+    "iata": "CDG",
+    "city": {
+     "en": "Paris",
+     "ru": "Париж"
+    },
+    "name": "Charles de Gaulle"
+   },
+   {
+    "iata": "ORY",
+    "city": {
+     "en": "Paris",
+     "ru": "Париж"
+    },
+    "name": "Orly"
+   },
+   {
+    "iata": "BVA",
+    "city": {
+     "en": "Paris",
+     "ru": "Париж"
+    },
+    "name": "Beauvais"
+   },
+   {
+    "iata": "NCE",
+    "city": {
+     "en": "Nice",
+     "ru": "Ницца"
+    },
+    "name": "Côte d'Azur"
+   },
+   {
+    "iata": "MRS",
+    "city": {
+     "en": "Marseille",
+     "ru": "Марсель"
+    },
+    "name": "Provence"
+   },
+   {
+    "iata": "LYS",
+    "city": {
+     "en": "Lyon",
+     "ru": "Лион"
+    },
+    "name": "Saint-Exupéry"
+   },
+   {
+    "iata": "TLS",
+    "city": {
+     "en": "Toulouse",
+     "ru": "Тулуза"
+    },
+    "name": "Blagnac"
+   },
+   {
+    "iata": "BOD",
+    "city": {
+     "en": "Bordeaux",
+     "ru": "Бордо"
+    },
+    "name": "Mérignac"
+   }
+  ]
+ },
+ {
+  "code": "GE",
+  "name": {
+   "en": "Georgia",
+   "ru": "Грузия"
+  },
+  "airports": [
+   {
+    "iata": "TBS",
+    "city": {
+     "en": "Tbilisi",
+     "ru": "Тбилиси"
+    },
+    "name": "Shota Rustaveli"
+   },
+   {
+    "iata": "BUS",
+    "city": {
+     "en": "Batumi",
+     "ru": "Батуми"
+    },
+    "name": "Batumi"
+   },
+   {
+    "iata": "KUT",
+    "city": {
+     "en": "Kutaisi",
+     "ru": "Кутаиси"
+    },
+    "name": "David the Builder"
+   }
+  ]
+ },
+ {
+  "code": "DE",
+  "name": {
+   "en": "Germany",
+   "ru": "Германия"
+  },
+  "airports": [
+   {
+    "iata": "FRA",
+    "city": {
+     "en": "Frankfurt",
+     "ru": "Франкфурт"
+    },
+    "name": "Frankfurt am Main"
+   },
+   {
+    "iata": "MUC",
+    "city": {
+     "en": "Munich",
+     "ru": "Мюнхен"
+    },
+    "name": "Franz Josef Strauss"
+   },
+   {
+    "iata": "BER",
+    "city": {
+     "en": "Berlin",
+     "ru": "Берлин"
+    },
+    "name": "Brandenburg"
+   },
+   {
+    "iata": "DUS",
+    "city": {
+     "en": "Düsseldorf",
+     "ru": "Дюссельдорф"
+    },
+    "name": "Düsseldorf"
+   },
+   {
+    "iata": "HAM",
+    "city": {
+     "en": "Hamburg",
+     "ru": "Гамбург"
+    },
+    "name": "Hamburg"
+   },
+   {
+    "iata": "CGN",
+    "city": {
+     "en": "Cologne",
+     "ru": "Кёльн"
+    },
+    "name": "Köln/Bonn"
+   },
+   {
+    "iata": "STR",
+    "city": {
+     "en": "Stuttgart",
+     "ru": "Штутгарт"
+    },
+    "name": "Stuttgart"
+   }
+  ]
+ },
+ {
+  "code": "GR",
+  "name": {
+   "en": "Greece",
+   "ru": "Греция"
+  },
+  "airports": [
+   {
+    "iata": "ATH",
+    "city": {
+     "en": "Athens",
+     "ru": "Афины"
+    },
+    "name": "Eleftherios Venizelos"
+   },
+   {
+    "iata": "SKG",
+    "city": {
+     "en": "Thessaloniki",
+     "ru": "Салоники"
+    },
+    "name": "Makedonia"
+   },
+   {
+    "iata": "HER",
+    "city": {
+     "en": "Heraklion",
+     "ru": "Ираклион"
+    },
+    "name": "Nikos Kazantzakis"
+   },
+   {
+    "iata": "CHQ",
+    "city": {
+     "en": "Chania",
+     "ru": "Ханья"
+    },
+    "name": "Ioannis Daskalogiannis"
+   },
+   {
+    "iata": "RHO",
+    "city": {
+     "en": "Rhodes",
+     "ru": "Родос"
+    },
+    "name": "Diagoras"
+   },
+   {
+    "iata": "CFU",
+    "city": {
+     "en": "Corfu",
+     "ru": "Корфу"
+    },
+    "name": "Ioannis Kapodistrias"
+   },
+   {
+    "iata": "JTR",
+    "city": {
+     "en": "Santorini",
+     "ru": "Санторини"
+    },
+    "name": "Santorini"
+   },
+   {
+    "iata": "JMK",
+    "city": {
+     "en": "Mykonos",
+     "ru": "Миконос"
+    },
+    "name": "Mykonos"
+   },
+   {
+    "iata": "KGS",
+    "city": {
+     "en": "Kos",
+     "ru": "Кос"
+    },
+    "name": "Hippocrates"
+   },
+   {
+    "iata": "ZTH",
+    "city": {
+     "en": "Zakynthos",
+     "ru": "Закинф"
+    },
+    "name": "Dionysios Solomos"
+   }
+  ]
+ },
+ {
+  "code": "HU",
+  "name": {
+   "en": "Hungary",
+   "ru": "Венгрия"
+  },
+  "airports": [
+   {
+    "iata": "BUD",
+    "city": {
+     "en": "Budapest",
+     "ru": "Будапешт"
+    },
+    "name": "Ferenc Liszt"
+   },
+   {
+    "iata": "DEB",
+    "city": {
+     "en": "Debrecen",
+     "ru": "Дебрецен"
+    },
+    "name": "Debrecen"
+   }
+  ]
+ },
+ {
+  "code": "IN",
+  "name": {
+   "en": "India",
+   "ru": "Индия"
+  },
+  "airports": [
+   {
+    "iata": "DEL",
+    "city": {
+     "en": "Delhi",
+     "ru": "Дели"
+    },
+    "name": "Indira Gandhi"
+   },
+   {
+    "iata": "BOM",
+    "city": {
+     "en": "Mumbai",
+     "ru": "Мумбаи"
+    },
+    "name": "Chhatrapati Shivaji"
+   },
+   {
+    "iata": "GOI",
+    "city": {
+     "en": "Goa",
+     "ru": "Гоа"
+    },
+    "name": "Dabolim"
+   },
+   {
+    "iata": "GOX",
+    "city": {
+     "en": "Goa",
+     "ru": "Гоа"
+    },
+    "name": "Manohar"
+   }
+  ]
+ },
+ {
+  "code": "IE",
+  "name": {
+   "en": "Ireland",
+   "ru": "Ирландия"
+  },
+  "airports": [
+   {
+    "iata": "DUB",
+    "city": {
+     "en": "Dublin",
+     "ru": "Дублин"
+    },
+    "name": "Dublin"
+   },
+   {
+    "iata": "ORK",
+    "city": {
+     "en": "Cork",
+     "ru": "Корк"
+    },
+    "name": "Cork"
+   }
+  ]
+ },
+ {
+  "code": "IL",
+  "name": {
+   "en": "Israel",
+   "ru": "Израиль"
+  },
+  "airports": [
+   {
+    "iata": "TLV",
+    "city": {
+     "en": "Tel Aviv",
+     "ru": "Тель-Авив"
+    },
+    "name": "Ben Gurion"
+   },
+   {
+    "iata": "ETM",
+    "city": {
+     "en": "Eilat",
+     "ru": "Эйлат"
+    },
+    "name": "Ramon"
+   }
+  ]
+ },
+ {
+  "code": "IT",
+  "name": {
+   "en": "Italy",
+   "ru": "Италия"
+  },
+  "airports": [
+   {
+    "iata": "FCO",
+    "city": {
+     "en": "Rome",
+     "ru": "Рим"
+    },
+    "name": "Fiumicino"
+   },
+   {
+    "iata": "CIA",
+    "city": {
+     "en": "Rome",
+     "ru": "Рим"
+    },
+    "name": "Ciampino"
+   },
+   {
+    "iata": "MXP",
+    "city": {
+     "en": "Milan",
+     "ru": "Милан"
+    },
+    "name": "Malpensa"
+   },
+   {
+    "iata": "LIN",
+    "city": {
+     "en": "Milan",
+     "ru": "Милан"
+    },
+    "name": "Linate"
+   },
+   {
+    "iata": "BGY",
+    "city": {
+     "en": "Bergamo",
+     "ru": "Бергамо"
+    },
+    "name": "Orio al Serio"
+   },
+   {
+    "iata": "VCE",
+    "city": {
+     "en": "Venice",
+     "ru": "Венеция"
+    },
+    "name": "Marco Polo"
+   },
+   {
+    "iata": "TSF",
+    "city": {
+     "en": "Treviso",
+     "ru": "Тревизо"
+    },
+    "name": "Treviso"
+   },
+   {
+    "iata": "NAP",
+    "city": {
+     "en": "Naples",
+     "ru": "Неаполь"
+    },
+    "name": "Capodichino"
+   },
+   {
+    "iata": "BLQ",
+    "city": {
+     "en": "Bologna",
+     "ru": "Болонья"
+    },
+    "name": "Guglielmo Marconi"
+   },
+   {
+    "iata": "FLR",
+    "city": {
+     "en": "Florence",
+     "ru": "Флоренция"
+    },
+    "name": "Peretola"
+   },
+   {
+    "iata": "PSA",
+    "city": {
+     "en": "Pisa",
+     "ru": "Пиза"
+    },
+    "name": "Galileo Galilei"
+   },
+   {
+    "iata": "CTA",
+    "city": {
+     "en": "Catania",
+     "ru": "Катания"
+    },
+    "name": "Fontanarossa"
+   },
+   {
+    "iata": "PMO",
+    "city": {
+     "en": "Palermo",
+     "ru": "Палермо"
+    },
+    "name": "Falcone-Borsellino"
+   },
+   {
+    "iata": "BRI",
+    "city": {
+     "en": "Bari",
+     "ru": "Бари"
+    },
+    "name": "Karol Wojtyła"
+   },
+   {
+    "iata": "TRN",
+    "city": {
+     "en": "Turin",
+     "ru": "Турин"
+    },
+    "name": "Caselle"
+   },
+   {
+    "iata": "VRN",
+    "city": {
+     "en": "Verona",
+     "ru": "Верона"
+    },
+    "name": "Villafranca"
+   },
+   {
+    "iata": "CAG",
+    "city": {
+     "en": "Cagliari",
+     "ru": "Кальяри"
+    },
+    "name": "Elmas"
+   },
+   {
+    "iata": "OLB",
+    "city": {
+     "en": "Olbia",
+     "ru": "Ольбия"
+    },
+    "name": "Costa Smeralda"
+   }
+  ]
+ },
+ {
+  "code": "JP",
+  "name": {
+   "en": "Japan",
+   "ru": "Япония"
+  },
+  "airports": [
+   {
+    "iata": "NRT",
+    "city": {
+     "en": "Tokyo",
+     "ru": "Токио"
+    },
+    "name": "Narita"
+   },
+   {
+    "iata": "HND",
+    "city": {
+     "en": "Tokyo",
+     "ru": "Токио"
+    },
+    "name": "Haneda"
+   },
+   {
+    "iata": "KIX",
+    "city": {
+     "en": "Osaka",
+     "ru": "Осака"
+    },
+    "name": "Kansai"
+   },
+   {
+    "iata": "ITM",
+    "city": {
+     "en": "Osaka",
+     "ru": "Осака"
+    },
+    "name": "Itami"
+   },
+   {
+    "iata": "NGO",
+    "city": {
+     "en": "Nagoya",
+     "ru": "Нагоя"
+    },
+    "name": "Chubu Centrair"
+   },
+   {
+    "iata": "FUK",
+    "city": {
+     "en": "Fukuoka",
+     "ru": "Фукуока"
+    },
+    "name": "Fukuoka"
+   },
+   {
+    "iata": "CTS",
+    "city": {
+     "en": "Sapporo",
+     "ru": "Саппоро"
+    },
+    "name": "New Chitose"
+   },
+   {
+    "iata": "OKA",
+    "city": {
+     "en": "Okinawa",
+     "ru": "Окинава"
+    },
+    "name": "Naha"
+   }
+  ]
+ },
+ {
+  "code": "LV",
+  "name": {
+   "en": "Latvia",
+   "ru": "Латвия"
+  },
+  "airports": [
+   {
+    "iata": "RIX",
+    "city": {
+     "en": "Riga",
+     "ru": "Рига"
+    },
+    "name": "Riga"
+   }
+  ]
+ },
+ {
+  "code": "LT",
+  "name": {
+   "en": "Lithuania",
+   "ru": "Литва"
+  },
+  "airports": [
+   {
+    "iata": "VNO",
+    "city": {
+     "en": "Vilnius",
+     "ru": "Вильнюс"
+    },
+    "name": "Vilnius"
+   },
+   {
+    "iata": "KUN",
+    "city": {
+     "en": "Kaunas",
+     "ru": "Каунас"
+    },
+    "name": "Kaunas"
+   }
+  ]
+ },
+ {
+  "code": "MT",
+  "name": {
+   "en": "Malta",
+   "ru": "Мальта"
+  },
+  "airports": [
+   {
+    "iata": "MLA",
+    "city": {
+     "en": "Malta",
+     "ru": "Мальта"
+    },
+    "name": "Malta International"
+   }
+  ]
+ },
+ {
+  "code": "ME",
+  "name": {
+   "en": "Montenegro",
+   "ru": "Черногория"
+  },
+  "airports": [
+   {
+    "iata": "TGD",
+    "city": {
+     "en": "Podgorica",
+     "ru": "Подгорица"
+    },
+    "name": "Podgorica"
+   },
+   {
+    "iata": "TIV",
+    "city": {
+     "en": "Tivat",
+     "ru": "Тиват"
+    },
+    "name": "Tivat"
+   }
+  ]
+ },
+ {
+  "code": "MA",
+  "name": {
+   "en": "Morocco",
+   "ru": "Марокко"
+  },
+  "airports": [
+   {
+    "iata": "CMN",
+    "city": {
+     "en": "Casablanca",
+     "ru": "Касабланка"
+    },
+    "name": "Mohammed V"
+   },
+   {
+    "iata": "RAK",
+    "city": {
+     "en": "Marrakesh",
+     "ru": "Марракеш"
+    },
+    "name": "Menara"
+   }
+  ]
+ },
+ {
+  "code": "NL",
+  "name": {
+   "en": "Netherlands",
+   "ru": "Нидерланды"
+  },
+  "airports": [
+   {
+    "iata": "AMS",
+    "city": {
+     "en": "Amsterdam",
+     "ru": "Амстердам"
+    },
+    "name": "Schiphol"
+   },
+   {
+    "iata": "EIN",
+    "city": {
+     "en": "Eindhoven",
+     "ru": "Эйндховен"
+    },
+    "name": "Eindhoven"
+   },
+   {
+    "iata": "RTM",
+    "city": {
+     "en": "Rotterdam",
+     "ru": "Роттердам"
+    },
+    "name": "Rotterdam The Hague"
+   }
+  ]
+ },
+ {
+  "code": "PL",
+  "name": {
+   "en": "Poland",
+   "ru": "Польша"
+  },
+  "airports": [
+   {
+    "iata": "WAW",
+    "city": {
+     "en": "Warsaw",
+     "ru": "Варшава"
+    },
+    "name": "Chopin"
+   },
+   {
+    "iata": "WMI",
+    "city": {
+     "en": "Warsaw",
+     "ru": "Варшава"
+    },
+    "name": "Modlin"
+   },
+   {
+    "iata": "KRK",
+    "city": {
+     "en": "Krakow",
+     "ru": "Краков"
+    },
+    "name": "John Paul II"
+   },
+   {
+    "iata": "GDN",
+    "city": {
+     "en": "Gdansk",
+     "ru": "Гданьск"
+    },
+    "name": "Lech Wałęsa"
+   },
+   {
+    "iata": "WRO",
+    "city": {
+     "en": "Wroclaw",
+     "ru": "Вроцлав"
+    },
+    "name": "Copernicus"
+   },
+   {
+    "iata": "KTW",
+    "city": {
+     "en": "Katowice",
+     "ru": "Катовице"
+    },
+    "name": "Pyrzowice"
+   }
+  ]
+ },
+ {
+  "code": "PT",
+  "name": {
+   "en": "Portugal",
+   "ru": "Португалия"
+  },
+  "airports": [
+   {
+    "iata": "LIS",
+    "city": {
+     "en": "Lisbon",
+     "ru": "Лиссабон"
+    },
+    "name": "Humberto Delgado"
+   },
+   {
+    "iata": "OPO",
+    "city": {
+     "en": "Porto",
+     "ru": "Порту"
+    },
+    "name": "Francisco Sá Carneiro"
+   },
+   {
+    "iata": "FAO",
+    "city": {
+     "en": "Faro",
+     "ru": "Фару"
+    },
+    "name": "Faro"
+   },
+   {
+    "iata": "FNC",
+    "city": {
+     "en": "Funchal",
+     "ru": "Фуншал"
+    },
+    "name": "Madeira"
+   }
+  ]
+ },
+ {
+  "code": "RO",
+  "name": {
+   "en": "Romania",
+   "ru": "Румыния"
+  },
+  "airports": [
+   {
+    "iata": "OTP",
+    "city": {
+     "en": "Bucharest",
+     "ru": "Бухарест"
+    },
+    "name": "Henri Coandă"
+   },
+   {
+    "iata": "CLJ",
+    "city": {
+     "en": "Cluj-Napoca",
+     "ru": "Клуж-Напока"
+    },
+    "name": "Avram Iancu"
+   },
+   {
+    "iata": "IAS",
+    "city": {
+     "en": "Iasi",
+     "ru": "Яссы"
+    },
+    "name": "Iași"
+   }
+  ]
+ },
+ {
+  "code": "RS",
+  "name": {
+   "en": "Serbia",
+   "ru": "Сербия"
+  },
+  "airports": [
+   {
+    "iata": "BEG",
+    "city": {
+     "en": "Belgrade",
+     "ru": "Белград"
+    },
+    "name": "Nikola Tesla"
+   }
+  ]
+ },
+ {
+  "code": "SI",
+  "name": {
+   "en": "Slovenia",
+   "ru": "Словения"
+  },
+  "airports": [
+   {
+    "iata": "LJU",
+    "city": {
+     "en": "Ljubljana",
+     "ru": "Любляна"
+    },
+    "name": "Jože Pučnik"
+   }
+  ]
+ },
+ {
+  "code": "ES",
+  "name": {
+   "en": "Spain",
+   "ru": "Испания"
+  },
+  "airports": [
+   {
+    "iata": "MAD",
+    "city": {
+     "en": "Madrid",
+     "ru": "Мадрид"
+    },
+    "name": "Barajas"
+   },
+   {
+    "iata": "BCN",
+    "city": {
+     "en": "Barcelona",
+     "ru": "Барселона"
+    },
+    "name": "El Prat"
+   },
+   {
+    "iata": "AGP",
+    "city": {
+     "en": "Malaga",
+     "ru": "Малага"
+    },
+    "name": "Costa del Sol"
+   },
+   {
+    "iata": "VLC",
+    "city": {
+     "en": "Valencia",
+     "ru": "Валенсия"
+    },
+    "name": "Valencia"
+   },
+   {
+    "iata": "ALC",
+    "city": {
+     "en": "Alicante",
+     "ru": "Аликанте"
+    },
+    "name": "Elche"
+   },
+   {
+    "iata": "PMI",
+    "city": {
+     "en": "Palma de Mallorca",
+     "ru": "Пальма-де-Мальорка"
+    },
+    "name": "Palma"
+   },
+   {
+    "iata": "SVQ",
+    "city": {
+     "en": "Seville",
+     "ru": "Севилья"
+    },
+    "name": "San Pablo"
+   },
+   {
+    "iata": "BIO",
+    "city": {
+     "en": "Bilbao",
+     "ru": "Бильбао"
+    },
+    "name": "Bilbao"
+   },
+   {
+    "iata": "IBZ",
+    "city": {
+     "en": "Ibiza",
+     "ru": "Ибица"
+    },
+    "name": "Ibiza"
+   },
+   {
+    "iata": "TFS",
+    "city": {
+     "en": "Tenerife",
+     "ru": "Тенерифе"
+    },
+    "name": "Tenerife South"
+   }
+  ]
+ },
+ {
+  "code": "SE",
+  "name": {
+   "en": "Sweden",
+   "ru": "Швеция"
+  },
+  "airports": [
+   {
+    "iata": "ARN",
+    "city": {
+     "en": "Stockholm",
+     "ru": "Стокгольм"
+    },
+    "name": "Arlanda"
+   },
+   {
+    "iata": "GOT",
+    "city": {
+     "en": "Gothenburg",
+     "ru": "Гётеборг"
+    },
+    "name": "Landvetter"
+   }
+  ]
+ },
+ {
+  "code": "CH",
+  "name": {
+   "en": "Switzerland",
+   "ru": "Швейцария"
+  },
+  "airports": [
+   {
+    "iata": "ZRH",
+    "city": {
+     "en": "Zurich",
+     "ru": "Цюрих"
+    },
+    "name": "Zurich"
+   },
+   {
+    "iata": "GVA",
+    "city": {
+     "en": "Geneva",
+     "ru": "Женева"
+    },
+    "name": "Cointrin"
+   },
+   {
+    "iata": "BSL",
+    "city": {
+     "en": "Basel",
+     "ru": "Базель"
+    },
+    "name": "EuroAirport"
+   }
+  ]
+ },
+ {
+  "code": "TH",
+  "name": {
+   "en": "Thailand",
+   "ru": "Таиланд"
+  },
+  "airports": [
+   {
+    "iata": "BKK",
+    "city": {
+     "en": "Bangkok",
+     "ru": "Бангкок"
+    },
+    "name": "Suvarnabhumi"
+   },
+   {
+    "iata": "DMK",
+    "city": {
+     "en": "Bangkok",
+     "ru": "Бангкок"
+    },
+    "name": "Don Mueang"
+   },
+   {
+    "iata": "HKT",
+    "city": {
+     "en": "Phuket",
+     "ru": "Пхукет"
+    },
+    "name": "Phuket"
+   },
+   {
+    "iata": "CNX",
+    "city": {
+     "en": "Chiang Mai",
+     "ru": "Чиангмай"
+    },
+    "name": "Chiang Mai"
+   },
+   {
+    "iata": "USM",
+    "city": {
+     "en": "Koh Samui",
+     "ru": "Самуи"
+    },
+    "name": "Samui"
+   }
+  ]
+ },
+ {
+  "code": "TR",
+  "name": {
+   "en": "Turkey",
+   "ru": "Турция"
+  },
+  "airports": [
+   {
+    "iata": "IST",
+    "city": {
+     "en": "Istanbul",
+     "ru": "Стамбул"
+    },
+    "name": "Istanbul"
+   },
+   {
+    "iata": "SAW",
+    "city": {
+     "en": "Istanbul",
+     "ru": "Стамбул"
+    },
+    "name": "Sabiha Gökçen"
+   },
+   {
+    "iata": "AYT",
+    "city": {
+     "en": "Antalya",
+     "ru": "Анталья"
+    },
+    "name": "Antalya"
+   },
+   {
+    "iata": "ADB",
+    "city": {
+     "en": "Izmir",
+     "ru": "Измир"
+    },
+    "name": "Adnan Menderes"
+   },
+   {
+    "iata": "DLM",
+    "city": {
+     "en": "Dalaman",
+     "ru": "Даламан"
+    },
+    "name": "Dalaman"
+   },
+   {
+    "iata": "BJV",
+    "city": {
+     "en": "Bodrum",
+     "ru": "Бодрум"
+    },
+    "name": "Milas-Bodrum"
+   }
+  ]
+ },
+ {
+  "code": "AE",
+  "name": {
+   "en": "United Arab Emirates",
+   "ru": "ОАЭ"
+  },
+  "airports": [
+   {
+    "iata": "DXB",
+    "city": {
+     "en": "Dubai",
+     "ru": "Дубай"
+    },
+    "name": "Dubai International"
+   },
+   {
+    "iata": "DWC",
+    "city": {
+     "en": "Dubai",
+     "ru": "Дубай"
+    },
+    "name": "Al Maktoum"
+   },
+   {
+    "iata": "AUH",
+    "city": {
+     "en": "Abu Dhabi",
+     "ru": "Абу-Даби"
+    },
+    "name": "Zayed International"
+   }
+  ]
+ },
+ {
+  "code": "GB",
+  "name": {
+   "en": "United Kingdom",
+   "ru": "Великобритания"
+  },
+  "airports": [
+   {
+    "iata": "LHR",
+    "city": {
+     "en": "London",
+     "ru": "Лондон"
+    },
+    "name": "Heathrow"
+   },
+   {
+    "iata": "LGW",
+    "city": {
+     "en": "London",
+     "ru": "Лондон"
+    },
+    "name": "Gatwick"
+   },
+   {
+    "iata": "STN",
+    "city": {
+     "en": "London",
+     "ru": "Лондон"
+    },
+    "name": "Stansted"
+   },
+   {
+    "iata": "LTN",
+    "city": {
+     "en": "London",
+     "ru": "Лондон"
+    },
+    "name": "Luton"
+   },
+   {
+    "iata": "MAN",
+    "city": {
+     "en": "Manchester",
+     "ru": "Манчестер"
+    },
+    "name": "Manchester"
+   },
+   {
+    "iata": "EDI",
+    "city": {
+     "en": "Edinburgh",
+     "ru": "Эдинбург"
+    },
+    "name": "Edinburgh"
+   },
+   {
+    "iata": "BHX",
+    "city": {
+     "en": "Birmingham",
+     "ru": "Бирмингем"
+    },
+    "name": "Birmingham"
+   }
+  ]
+ },
+ {
+  "code": "US",
+  "name": {
+   "en": "United States",
+   "ru": "США"
+  },
+  "airports": [
+   {
+    "iata": "JFK",
+    "city": {
+     "en": "New York",
+     "ru": "Нью-Йорк"
+    },
+    "name": "John F. Kennedy"
+   },
+   {
+    "iata": "EWR",
+    "city": {
+     "en": "Newark",
+     "ru": "Ньюарк"
+    },
+    "name": "Newark Liberty"
+   },
+   {
+    "iata": "LAX",
+    "city": {
+     "en": "Los Angeles",
+     "ru": "Лос-Анджелес"
+    },
+    "name": "Los Angeles"
+   },
+   {
+    "iata": "MIA",
+    "city": {
+     "en": "Miami",
+     "ru": "Майами"
+    },
+    "name": "Miami"
+   },
+   {
+    "iata": "SFO",
+    "city": {
+     "en": "San Francisco",
+     "ru": "Сан-Франциско"
+    },
+    "name": "San Francisco"
+   },
+   {
+    "iata": "BOS",
+    "city": {
+     "en": "Boston",
+     "ru": "Бостон"
+    },
+    "name": "Logan"
+   },
+   {
+    "iata": "ORD",
+    "city": {
+     "en": "Chicago",
+     "ru": "Чикаго"
+    },
+    "name": "O'Hare"
+   },
+   {
+    "iata": "IAD",
+    "city": {
+     "en": "Washington",
+     "ru": "Вашингтон"
+    },
+    "name": "Dulles"
+   }
+  ]
+ }
+]

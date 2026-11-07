@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TrackerStatus {
+  ACTIVE
+  PAUSED
+}
+
+/// Direction of date flexibility: PLUS = +N days, MINUS = -N days, BOTH = ±N days
+enum FlexMode {
+  PLUS
+  MINUS
+  BOTH
+}
+
+enum CabinClass {
+  ECONOMY
+  PREMIUM_ECONOMY
+  BUSINESS
+  FIRST
+}
+
+enum SearchRunStatus {
+  QUEUED
+  RUNNING
+  SUCCESS      // offers found
+  NO_RESULTS   // provider answered, but nothing matched the criteria
+  PARTIAL      // some provider calls failed, some offers found
+  FAILED       // provider unavailable / error – NOT the same as "no flights"
+}
+
+enum SearchTrigger {
+  SCHEDULED
+  MANUAL
+  INITIAL
+}
+
+/// LIVE = confirmed by a live price check, INDICATIVE = cached/approximate price
+enum PriceStatus {
+  LIVE
+  INDICATIVE
+}
+
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+}
+
+enum NotificationKind {
+  DAILY_SUMMARY
+  PRICE_DROP
+  TEST
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+  SKIPPED
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  passwordHash       String?
+  googleId           String?   @unique
+  name               String?
+  phone              String?
+  whatsappConsentAt  DateTime?
+  locale             String    @default("ru")
+  timezone           String    @default("Asia/Jerusalem")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  trackers           FlightTracker[]
+  preferences        NotificationPreference?
+  notificationLogs   NotificationLog[]
+}
+
+model NotificationPreference {
+  userId                 String  @id
+  user                   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled           Boolean @default(true)
+  whatsappEnabled        Boolean @default(false)
+  dailySummaryEnabled    Boolean @default(true)
+  priceDropAlertEnabled  Boolean @default(true)
+  /// Significant drop threshold (%) for an extra alert
+  priceDropAlertPct      Float   @default(10)
+  /// Local time "HH:mm" in `timezone`
+  preferredTime          String  @default("07:00")
+  timezone               String  @default("Asia/Jerusalem")
+}
+
+model FlightTracker {
+  id                    String        @id @default(cuid())
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                  String?
+  originCountry         String        @default("IL")
+  originAirport         String        @default("TLV")
+  destinationCountry    String
+  /// Empty array = all passenger airports of destinationCountry
+  destinationAirports   String[]      @default([])
+  departureDate         DateTime      @db.Date
+  returnDate            DateTime      @db.Date
+  departureFlexDays     Int           @default(2)
+  departureFlexMode     FlexMode      @default(PLUS)
+  returnFlexDays        Int           @default(2)
+  returnFlexMode        FlexMode      @default(MINUS)
+  /// Max stops in EACH direction
+  maxStops              Int           @default(1)
+  adults                Int           @default(1)
+  cabinClass            CabinClass    @default(ECONOMY)
+  currency              String        @default("ILS")
+  targetPrice           Decimal?      @db.Decimal(12, 2)
+  /// Changes below this percentage are "no significant change"
+  significantChangePct  Float         @default(2)
+  status                TrackerStatus @default(ACTIVE)
+  lastSearchAt          DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  searchRuns            SearchRun[]
+  snapshots             PriceSnapshot[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SearchRun {
+  id                   String          @id @default(cuid())
+  trackerId            String
+  tracker              FlightTracker   @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+  batchId              String?
+  batch                DailyBatch?     @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  trigger              SearchTrigger   @default(SCHEDULED)
+  status               SearchRunStatus @default(QUEUED)
+  startedAt            DateTime        @default(now())
+  completedAt          DateTime?
+  errorMessage         String?
+  combinationsChecked  Int             @default(0)
+  providerCallsFailed  Int             @default(0)
+  minPrice             Decimal?        @db.Decimal(12, 2)
+  currency             String?
+  /// Price analysis result (trend, minima, statuses) – see PriceAnalysis
+  analysis             Json?
+
+  offers               FlightOffer[]
+  snapshots            PriceSnapshot[]
+
+  @@index([trackerId, startedAt])
+}
+
+model FlightOffer {
+  id                  String      @id @default(cuid())
+  searchRunId         String
+  searchRun           SearchRun   @relation(fields: [searchRunId], references: [id], onDelete: Cascade)
+  provider            String
+  providerOfferId     String?
+  routeKey            String
+  originAirport       String
+  destinationAirport  String
+  departureDate       DateTime    @db.Date
+  returnDate          DateTime    @db.Date
+  airline             String?
+  outboundStops       Int
+  inboundStops        Int
+  outboundDurationMin Int?
+  inboundDurationMin  Int?
+  segments            Json?
+  /// Total round-trip price for all passengers incl. known mandatory taxes
+  price               Decimal     @db.Decimal(12, 2)
+  currency            String
+  baggageIncluded     Boolean?
+  baggagePrice        Decimal?    @db.Decimal(12, 2)
+  fareId              String?
+  bookingUrl          String?
+  priceStatus         PriceStatus
+  expiresAt           DateTime?
+  observedAt          DateTime    @default(now())
+
+  @@index([searchRunId, price])
+  @@index([routeKey, observedAt])
+}
+
+model PriceSnapshot {
+  id                 String        @id @default(cuid())
+  trackerId          String
+  tracker            FlightTracker @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+  searchRunId        String
+  searchRun          SearchRun     @relation(fields: [searchRunId], references: [id], onDelete: Cascade)
+  /// ORIGIN-DEST-YYYYMMDD-YYYYMMDD
+  routeKey           String
+  destinationAirport String
+  departureDate      DateTime      @db.Date
+  returnDate         DateTime      @db.Date
+  price              Decimal       @db.Decimal(12, 2)
+  currency           String
+  priceStatus        PriceStatus
+  recordedAt         DateTime      @default(now())
+
+  @@index([trackerId, recordedAt])
+  @@index([trackerId, routeKey, recordedAt])
+}
+
+model DailyBatch {
+  id                String      @id @default(cuid())
+  startedAt         DateTime    @default(now())
+  completedAt       DateTime?
+  trackersTotal     Int         @default(0)
+  trackersSucceeded Int         @default(0)
+  trackersFailed    Int         @default(0)
+  uniqueQueries     Int         @default(0)
+  cacheHits         Int         @default(0)
+  searchRuns        SearchRun[]
+}
+
+model NotificationLog {
+  id                 String              @id @default(cuid())
+  userId             String
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel            NotificationChannel
+  kind               NotificationKind
+  status             NotificationStatus
+  /// Prevents duplicate sends, e.g. "DAILY_SUMMARY:EMAIL:2027-04-15"
+  dedupeKey          String?             @unique
+  sentAt             DateTime            @default(now())
+  providerMessageId  String?
+  error              String?
+
+  @@index([userId, sentAt])
+}
