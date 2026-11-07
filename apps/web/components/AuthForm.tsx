@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
-import { LangSwitch } from './AppShell';
+import { Brand, LangSwitch } from './AppShell';
 
 export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const { t, locale } = useI18n();
@@ -33,7 +33,7 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   return (
     <div className="container">
       <div className="auth">
-        <div className="row"><h1 style={{ margin: 0 }}>✈️ {t.appName}</h1><span className="spacer" /><LangSwitch /></div>
+        <div className="row"><Brand /><span className="spacer" /><LangSwitch /></div>
         <p className="muted">{t.tagline}</p>
         <div className="card">
           <form onSubmit={submit}>

@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import AppShell from '@/components/AppShell';
+import AppShell, { PageHeader } from '@/components/AppShell';
 import { api, fmtDateTime } from '@/lib/api';
 import { Locale, useI18n } from '@/lib/i18n';
 
@@ -62,8 +62,8 @@ export default function Settings() {
   const waReady = !!profile?.phone && !!profile?.whatsappConsentAt;
 
   return (
-    <AppShell>
-      <h1>{t.settings}</h1>
+    <AppShell crumb={t.settings}>
+      <PageHeader title={t.settings} />
       {msg && <div className="notice">{msg}</div>}
       {error && <div className="error">{error}</div>}
 

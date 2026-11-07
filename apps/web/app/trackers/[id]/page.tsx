@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import AppShell from '@/components/AppShell';
+import { Flag } from '@/components/icons';
 import PriceChart from '@/components/PriceChart';
 import { RunChip, Trend } from '@/components/Trend';
 import { api, dateRange, fmtDateTime, money } from '@/lib/api';
@@ -43,8 +44,8 @@ export default function TrackerDetails({ params }: { params: { id: string } }) {
     if (confirm(t.leaveConfirm(fmtDateTime(o.observedAt, locale)))) window.open(o.bookingUrl, '_blank', 'noopener');
   };
 
-  if (error && !tracker) return <AppShell><div className="error">{error}</div></AppShell>;
-  if (!tracker) return <AppShell><p className="muted">…</p></AppShell>;
+  if (error && !tracker) return <AppShell crumb={t.trackersNav}><div className="error">{error}</div></AppShell>;
+  if (!tracker) return <AppShell crumb={t.trackersNav}><div className="card skeleton" /></AppShell>;
 
   const a = trends?.analysis;
   const cur = tracker.currency;
@@ -52,15 +53,22 @@ export default function TrackerDetails({ params }: { params: { id: string } }) {
   const pctStr = (p: number | null) => (p == null ? '—' : `${p > 0 ? '+' : ''}${p.toFixed(1)}%`);
 
   return (
-    <AppShell>
-      <div className="row" style={{ marginBottom: 8 }}>
-        <h1 style={{ margin: 0 }}>{tracker.originAirport} → {tracker.country.flag} {tracker.country.name[locale]}</h1>
-        <span className={`chip ${tracker.status === 'ACTIVE' ? 'ok' : ''}`}>{tracker.status === 'ACTIVE' ? t.active : t.paused}</span>
-        <span className="spacer" />
-        <Link className="btn" href={`/trackers/${id}/edit`}>{t.edit}</Link>
-        <button className="btn primary" onClick={searchNow} disabled={tracker.status !== 'ACTIVE' || results?.inProgress}>
-          {results?.inProgress ? t.searching : t.searchNow}
-        </button>
+    <AppShell crumb={`${tracker.originAirport} → ${tracker.country.name[locale]}`}>
+      <div className="page-head" style={{ marginBottom: 10 }}>
+        <div>
+          <div className="eyebrow">LLB • {t.trackersNav}</div>
+          <div className="row" style={{ gap: 14 }}>
+            <Flag code={tracker.destinationCountry} />
+            <h1 style={{ margin: 0 }}>{tracker.originAirport} → {tracker.country.name[locale]}</h1>
+            <span className={`pill ${tracker.status === 'ACTIVE' ? 'ok' : 'paused'}`}><i />{tracker.status === 'ACTIVE' ? t.active : t.paused}</span>
+          </div>
+        </div>
+        <div className="row">
+          <Link className="btn" href={`/trackers/${id}/edit`}>{t.edit}</Link>
+          <button className="btn primary" onClick={searchNow} disabled={tracker.status !== 'ACTIVE' || results?.inProgress}>
+            {results?.inProgress ? t.searching : t.searchNow}
+          </button>
+        </div>
       </div>
       <p className="muted" style={{ marginTop: 0 }}>
         {tracker.name && <><b>{tracker.name}</b> · </>}

@@ -21,12 +21,15 @@ class LoginDto {
 
 const cookieOpts = { httpOnly: true, sameSite: 'lax' as const, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000, path: '/' };
 
+/** Brute-force protection for credential endpoints only – /me and /providers are read on every page. */
+const STRICT = { default: { limit: 10, ttl: 60_000 } };
+
 @Controller('auth')
-@Throttle({ default: { limit: 10, ttl: 60_000 } })
 export class AuthController {
   constructor(private auth: AuthService, private prisma: PrismaService) {}
 
   @Post('register')
+  @Throttle(STRICT)
   async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const user = await this.auth.register(dto.email, dto.password, dto.name, dto.locale);
     res.cookie(AUTH_COOKIE, this.auth.sign(user.id), cookieOpts);
@@ -34,6 +37,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle(STRICT)
   @HttpCode(200)
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const user = await this.auth.login(dto.email, dto.password);
@@ -64,6 +68,7 @@ export class AuthController {
 
   // ---------- Google OAuth 2.0 (authorization code flow) ----------
   @Get('google')
+  @Throttle(STRICT)
   google(@Res() res: Response) {
     if (!config.google.clientId) throw new BadRequestException('Google sign-in is not configured');
     const state = randomBytes(16).toString('hex');
@@ -76,6 +81,7 @@ export class AuthController {
   }
 
   @Get('google/callback')
+  @Throttle(STRICT)
   async googleCallback(@Query('code') code: string, @Query('state') state: string, @Req() req: Request, @Res() res: Response) {
     if (!code || !state || state !== req.cookies?.ff_oauth_state) throw new BadRequestException('Invalid OAuth state');
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {

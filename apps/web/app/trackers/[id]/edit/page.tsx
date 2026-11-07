@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import AppShell from '@/components/AppShell';
+import AppShell, { PageHeader } from '@/components/AppShell';
 import TrackerForm, { TrackerValues } from '@/components/TrackerForm';
 import { api } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
@@ -19,8 +19,8 @@ export default function EditTracker({ params }: { params: { id: string } }) {
     })).catch((e) => setError(e.message));
   }, [params.id]);
   return (
-    <AppShell>
-      <h1>{t.editTracker}</h1>
+    <AppShell crumb={t.editTracker}>
+      <PageHeader title={t.editTracker} />
       {error && <div className="error">{error}</div>}
       {v && <TrackerForm initial={v} trackerId={params.id} />}
     </AppShell>
