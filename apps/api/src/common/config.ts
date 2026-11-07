@@ -15,6 +15,8 @@ export const config = {
   providers: {
     indicative: process.env.INDICATIVE_PROVIDER ?? 'mock',
     live: process.env.LIVE_PROVIDER ?? 'mock',
+    /** Optional independent provider that re-checks the cheapest live result of each tracker. */
+    control: process.env.CONTROL_PROVIDER ?? '',
     liveCheckTopN: num(process.env.LIVE_CHECK_TOP_N, 10),
     concurrency: num(process.env.PROVIDER_CONCURRENCY, 4),
     cacheTtlMin: num(process.env.SEARCH_CACHE_TTL_MINUTES, 180),

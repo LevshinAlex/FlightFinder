@@ -11,8 +11,8 @@ import { createLimiter, withRetry } from '../providers/retry';
 import { buildDateCombinations } from './date-combinations';
 import { SearchCacheService } from './search-cache.service';
 import {
-  allCriteria, cheapestPerRoute, determineOutcome, filterOffers, indicativeKey, liveKey,
-  offerRouteKey, selectLiveCandidates, TrackerSearchPlan,
+  allCriteria, cheapestPerRoute, compareControl, ControlCheck, determineOutcome, filterOffers, indicativeKey, liveKey,
+  offerRouteKey, pickControlCriteria, selectLiveCandidates, TrackerSearchPlan,
 } from './search-planner';
 
 /** Stops hammering a provider that is clearly down: after N consecutive failures, remaining calls fail fast. */
@@ -92,7 +92,7 @@ export class SearchEngineService {
     const indicativeProvider = this.providers.indicative();
     const indicative = new Map<string, Result<ProviderOffer[]>>();
     if (indicativeProvider) {
-      // group unique (origin,dest,pax,cabin,currency) → set of date pairs
+      // group unique (origin,dest,pax,cabin,currency,stops) → set of date pairs
       const groups = new Map<string, { plan: TrackerSearchPlan; destination: string; combos: Map<string, { departureDate: string; returnDate: string }> }>();
       for (const p of plans)
         for (const d of p.destinations)
@@ -101,7 +101,7 @@ export class SearchEngineService {
             if (indicative.has(k)) continue;
             const cached = await this.cache.get<ProviderOffer[]>(SearchCacheService.key('ind', indicativeProvider.name, { k }));
             if (cached) { indicative.set(k, { ok: true, value: cached, cached: true }); cacheHits++; continue; }
-            const gk = [p.origin, d, p.adults, p.cabinClass, p.currency].join('|');
+            const gk = [p.origin, d, p.adults, p.cabinClass, p.currency, p.maxStops].join('|');
             if (!groups.has(gk)) groups.set(gk, { plan: p, destination: d, combos: new Map() });
             groups.get(gk)!.combos.set(k, c);
           }
@@ -113,7 +113,7 @@ export class SearchEngineService {
         try {
           const offers = await withRetry(() => indicativeProvider.getIndicativePrices({
             origin: g.plan.origin, destinations: [g.destination], combinations: [...g.combos.values()],
-            adults: g.plan.adults, cabinClass: g.plan.cabinClass, currency: g.plan.currency,
+            adults: g.plan.adults, cabinClass: g.plan.cabinClass, currency: g.plan.currency, maxStops: g.plan.maxStops,
           }));
           for (const k of keys) {
             const c = g.combos.get(k)!;
@@ -166,13 +166,44 @@ export class SearchEngineService {
       })));
     }
 
+    // ---------- Stage 3 (optional): independent control check of each tracker's cheapest live result ----------
+    const controlProvider = this.providers.control();
+    const control = new Map<string, Result<ProviderOffer[]>>();
+    const controlByTracker = new Map<string, SearchCriteria>();
+    if (controlProvider) {
+      for (const p of plans) {
+        const cands = candidatesByTracker.get(p.trackerId)!;
+        const liveOffers = cands.flatMap((c) => { const r = live.get(liveKey(c)); return r?.ok ? r.value : []; });
+        const c = pickControlCriteria(p, cands, liveOffers);
+        if (c) controlByTracker.set(p.trackerId, c);
+      }
+      const unique = new Map<string, SearchCriteria>();
+      for (const c of controlByTracker.values()) unique.set(liveKey(c), c);
+      await Promise.all([...unique.entries()].map(([k, c]) => limit(async () => {
+        const ck = SearchCacheService.key('live', controlProvider.name, { k });
+        const cached = await this.cache.get<ProviderOffer[]>(ck);
+        if (cached) { control.set(k, { ok: true, value: cached, cached: true }); cacheHits++; return; }
+        try {
+          const v = await withRetry(() => controlProvider.searchFlights(c));
+          control.set(k, { ok: true, value: v, cached: false });
+          await this.cache.set(ck, v, Math.min(60, config.providers.cacheTtlMin));
+        } catch (e: any) {
+          // a control failure never degrades the run status – it is only reported
+          this.log.warn(`control ${k} failed: ${e.message}`);
+          control.set(k, { ok: false, error: e.message });
+        }
+      })));
+    }
+
     // ---------- Per tracker: filter, store, analyse ----------
     const results: TrackerRunResult[] = [];
     for (const t of trackers) {
       const p = plans.find((x) => x.trackerId === t.id)!;
       const runId = runs.get(t.id)!;
+      const cc = controlByTracker.get(t.id);
+      const controlRun = cc && controlProvider ? { provider: controlProvider.name, criteria: cc, result: control.get(liveKey(cc)) } : undefined;
       try {
-        results.push(await this.finalizeTracker(t, p, runId, indicative, live, candidatesByTracker.get(t.id)!));
+        results.push(await this.finalizeTracker(t, p, runId, indicative, live, candidatesByTracker.get(t.id)!, controlRun));
       } catch (e: any) {
         this.log.error(`tracker ${t.id} finalize failed: ${e.message}`);
         await this.prisma.searchRun.update({ where: { id: runId }, data: { status: 'FAILED', errorMessage: e.message, completedAt: new Date() } });
@@ -184,7 +215,7 @@ export class SearchEngineService {
       await this.prisma.dailyBatch.update({
         where: { id: batchId },
         data: {
-          uniqueQueries: { increment: indicative.size + live.size },
+          uniqueQueries: { increment: indicative.size + live.size + control.size },
           cacheHits: { increment: cacheHits },
         },
       });
@@ -205,6 +236,7 @@ export class SearchEngineService {
   private async finalizeTracker(
     t: FlightTracker, p: TrackerSearchPlan, runId: string,
     indicative: Map<string, Result<ProviderOffer[]>>, live: Map<string, Result<ProviderOffer[]>>, candidates: SearchCriteria[],
+    controlRun?: { provider: string; criteria: SearchCriteria; result?: Result<ProviderOffer[]> },
   ): Promise<TrackerRunResult> {
     const offers: ProviderOffer[] = [];
     let indCalls = 0, indFailed = 0, liveFailed = 0;
@@ -229,7 +261,17 @@ export class SearchEngineService {
     const callsTotal = indCalls + candidates.length;
     const callsFailed = indFailed + liveFailed;
 
-    const filtered = filterOffers(offers, p.maxStops, p.currency);
+    // Control source: report the price discrepancy, and keep its offers – if it found the same
+    // trip cheaper, the user should see that price. Its failures don't affect the outcome.
+    let controlCheck: ControlCheck | null = null;
+    if (controlRun) {
+      const r = controlRun.result ?? { ok: false as const, error: 'not executed' };
+      controlCheck = compareControl(controlRun.provider, controlRun.criteria, offers, r);
+      if (r.ok) offers.push(...r.value);
+    }
+
+    // rankingOnly offers (calendar prices without itinerary) only steer stage 2 – never stored
+    const filtered = filterOffers(offers.filter((o) => !o.rankingOnly), p.maxStops, p.currency);
     const perRoute = [...cheapestPerRoute(filtered).values()].sort((a, b) => a.price - b.price);
     let outcome = useLive
       ? determineOutcome(candidates.length, liveFailed, perRoute.length)
@@ -283,7 +325,7 @@ export class SearchEngineService {
       data: {
         status: outcome, completedAt: new Date(), combinationsChecked: callsTotal, providerCallsFailed: callsFailed,
         minPrice: current?.price, currency: p.currency,
-        analysis: { ...analysis, current } as unknown as Prisma.InputJsonValue,
+        analysis: { ...analysis, current, control: controlCheck } as unknown as Prisma.InputJsonValue,
         errorMessage: outcome === 'FAILED' ? 'Flight data provider unavailable' : null,
       },
     });

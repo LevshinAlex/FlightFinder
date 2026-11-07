@@ -23,6 +23,8 @@ export interface IndicativeCriteria {
   adults: number;
   cabinClass: CabinClass;
   currency: string;
+  /** Per direction. Providers that can filter server-side should; others ignore it. */
+  maxStops?: number;
 }
 
 export interface FlightSegment {
@@ -57,6 +59,11 @@ export interface ProviderOffer {
   /** true if itinerary is a self-transfer between separate tickets */
   selfTransfer?: boolean;
   priceStatus: 'LIVE' | 'INDICATIVE';
+  /**
+   * Price-only hint without itinerary details (e.g. calendar prices): used to choose which
+   * combinations get a live check, never stored or shown – its stops/airline are not known.
+   */
+  rankingOnly?: boolean;
   expiresAt?: string;
   observedAt: string;        // ISO timestamp from provider (cache age) or now
 }

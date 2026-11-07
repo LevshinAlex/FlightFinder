@@ -16,9 +16,12 @@ export interface TrackerSearchPlan {
   maxStops: number;
 }
 
-/** Key of an indicative lookup: one airport pair & one date pair (stops filtered later → more reuse). */
-export function indicativeKey(p: Pick<TrackerSearchPlan, 'origin' | 'adults' | 'cabinClass' | 'currency'>, destination: string, c: DateCombination): string {
-  return [p.origin, destination, c.departureDate, c.returnDate, p.adults, p.cabinClass, p.currency].join('|');
+/**
+ * Key of an indicative lookup: one airport pair & one date pair. Includes maxStops because some
+ * providers filter stops server-side (calendar prices carry no itinerary to filter afterwards).
+ */
+export function indicativeKey(p: Pick<TrackerSearchPlan, 'origin' | 'adults' | 'cabinClass' | 'currency' | 'maxStops'>, destination: string, c: DateCombination): string {
+  return [p.origin, destination, c.departureDate, c.returnDate, p.adults, p.cabinClass, p.currency, p.maxStops].join('|');
 }
 
 export function liveKey(c: SearchCriteria): string {
@@ -106,4 +109,43 @@ export function determineOutcome(callsTotal: number, callsFailed: number, offers
   if (callsTotal === 0) return 'FAILED';
   if (offersFound === 0) return callsFailed > 0 ? 'FAILED' : 'NO_RESULTS';
   return callsFailed > 0 ? 'PARTIAL' : 'SUCCESS';
+}
+
+/**
+ * Control check target: the criteria of the tracker's cheapest usable LIVE result
+ * (the price the user would act on). Null when the live stage found nothing.
+ */
+export function pickControlCriteria(plan: TrackerSearchPlan, candidates: SearchCriteria[], liveOffers: ProviderOffer[]): SearchCriteria | null {
+  const best = [...cheapestPerRoute(filterOffers(liveOffers.filter((o) => o.priceStatus === 'LIVE' && !o.rankingOnly), plan.maxStops, plan.currency)).values()]
+    .sort((a, b) => a.price - b.price)[0];
+  if (!best) return null;
+  return candidates.find((c) => c.destination === best.destination && c.departureDate === best.departureDate && c.returnDate === best.returnDate) ?? null;
+}
+
+export interface ControlCheck {
+  provider: string;
+  routeKey: string;
+  primaryPrice: number | null;
+  controlPrice: number | null;
+  /** (control − primary) / primary, %; negative = control source found it cheaper */
+  diffPct: number | null;
+  status: 'OK' | 'NO_RESULTS' | 'FAILED';
+  error?: string;
+}
+
+/** Compares the primary and control cheapest price for the same route + criteria. */
+export function compareControl(
+  provider: string, c: SearchCriteria, primaryOffers: ProviderOffer[],
+  control: { ok: true; value: ProviderOffer[] } | { ok: false; error: string },
+): ControlCheck {
+  const rk = routeKey(c.origin, c.destination, c.departureDate, c.returnDate);
+  const cheapest = (offers: ProviderOffer[]) => {
+    const prices = filterOffers(offers, c.maxStops, c.currency).filter((o) => offerRouteKey(o) === rk).map((o) => o.price);
+    return prices.length ? Math.min(...prices) : null;
+  };
+  const primaryPrice = cheapest(primaryOffers);
+  if (!control.ok) return { provider, routeKey: rk, primaryPrice, controlPrice: null, diffPct: null, status: 'FAILED', error: control.error };
+  const controlPrice = cheapest(control.value);
+  const diffPct = primaryPrice && controlPrice != null ? Math.round(((controlPrice - primaryPrice) / primaryPrice) * 1000) / 10 : null;
+  return { provider, routeKey: rk, primaryPrice, controlPrice, diffPct, status: controlPrice == null ? 'NO_RESULTS' : 'OK' };
 }
