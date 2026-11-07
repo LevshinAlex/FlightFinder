@@ -139,10 +139,21 @@ export class TrackersService {
     const inProgress = await this.prisma.searchRun.count({ where: { trackerId: id, status: { in: ['QUEUED', 'RUNNING'] } } });
     if (!run) return { run: null, offers: [], inProgress: inProgress > 0 };
     const offers = await this.prisma.flightOffer.findMany({ where: { searchRunId: run.id }, orderBy: { price: 'asc' }, take: 50 });
+    // city names of the itinerary airports (layovers) for the UI; unknown airports stay as IATA codes
+    const places: Record<string, { en: string; ru: string }> = {};
+    for (const o of offers) {
+      const segs = o.segments as { outbound?: { from: string; to: string }[]; inbound?: { from: string; to: string }[] } | null;
+      for (const x of [...(segs?.outbound ?? []), ...(segs?.inbound ?? [])])
+        for (const code of [x.from, x.to]) {
+          const ap = code && !places[code] ? this.airports.airport(code) : null;
+          if (ap) places[code] = ap.city;
+        }
+    }
     return {
       inProgress: inProgress > 0,
       run: { id: run.id, status: run.status, startedAt: run.startedAt, completedAt: run.completedAt, combinationsChecked: run.combinationsChecked, providerCallsFailed: run.providerCallsFailed, errorMessage: run.errorMessage },
       currency: t.currency,
+      places,
       offers: offers.map((o) => {
         const ap = this.airports.airport(o.destinationAirport);
         return {

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import { Flag } from '@/components/icons';
+import { LegStops, LegTimes } from '@/components/Itinerary';
 import PriceChart from '@/components/PriceChart';
 import { RunChip, Trend } from '@/components/Trend';
 import { api, dateRange, fmtDateTime, money } from '@/lib/api';
@@ -115,12 +116,14 @@ export default function TrackerDetails({ params }: { params: { id: string } }) {
               {results.offers.slice(0, 15).map((o: any) => (
                 <tr key={o.id}>
                   <td><b>{o.destinationCity?.[locale] ?? o.destinationAirport}</b> <span className="muted small">{o.destinationAirport}</span></td>
-                  <td className="small">{dateRange(o.departureDate, o.returnDate, locale)}</td>
+                  <td className="small">{o.segments?.outbound?.length ? <LegTimes segments={o.segments} outboundMin={o.outboundDurationMin} inboundMin={o.inboundDurationMin} /> : dateRange(o.departureDate, o.returnDate, locale)}</td>
                   <td className="small hide-sm">{o.airline ?? '—'}</td>
-                  <td className="small">{o.outboundStops} {t.out} / {o.inboundStops} {t.back}</td>
+                  <td className="small">{o.segments?.outbound?.length ? <LegStops segments={o.segments} places={results.places} outboundStops={o.outboundStops} inboundStops={o.inboundStops} /> : <>{o.outboundStops} {t.out} / {o.inboundStops} {t.back}</>}</td>
                   <td className="num">
                     <b>{money(o.price, o.currency, locale)}</b>
-                    {o.priceStatus === 'INDICATIVE'
+                    {o.provider === 'mock'
+                      ? <div className="small" style={{ color: 'var(--warn)' }} title={t.demoHint}>{t.demo}</div>
+                      : o.priceStatus === 'INDICATIVE'
                       ? <div className="small" style={{ color: 'var(--warn)' }} title={t.indicativeHint}>~ {t.indicative}</div>
                       : <div className="small muted">{t.live}</div>}
                     {o.baggageIncluded === false && o.baggagePrice != null && <div className="small muted">{t.baggage}: {t.bagExtra(money(o.baggagePrice, o.currency, locale))}</div>}

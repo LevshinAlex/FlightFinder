@@ -56,7 +56,8 @@ export class IgnavProvider implements FlightProvider {
   private legs(leg: any): FlightSegment[] {
     return (leg?.segments ?? []).map((s: any) => ({
       from: s.departure_airport, to: s.arrival_airport,
-      departAt: s.departure_time_utc ?? s.departure_time_local, arriveAt: s.arrival_time_utc ?? s.arrival_time_local,
+      // local airport time, like Google Flights: what the traveller sees on the ticket; layovers stay correct (same airport)
+      departAt: s.departure_time_local ?? s.departure_time_utc, arriveAt: s.arrival_time_local ?? s.arrival_time_utc,
       carrier: carrierName(s.marketing_carrier_code, s.operating_carrier_name), flightNumber: `${s.marketing_carrier_code ?? ''}${s.flight_number ?? ''}`,
     }));
   }

@@ -326,3 +326,14 @@ form.card > p.small { margin: 20px 0 14px; }
 .with-flag { position: relative; }
 .with-flag .flag-tile { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); pointer-events: none; border: 0; background: none; }
 .with-flag select { padding-left: 40px; }
+
+/* itinerary: times per direction, layovers */
+.legs { display: grid; gap: 4px; min-width: 190px; }
+.leg-row { display: flex; gap: 8px; align-items: baseline; white-space: nowrap; }
+.leg-label { color: var(--muted); font-size: 12px; min-width: 56px; }
+.day-shift { color: var(--warn); font-weight: 700; margin-left: 2px; }
+.layovers { display: inline-flex; flex-wrap: wrap; gap: 4px 10px; white-space: normal; }
+.layover { white-space: nowrap; }
+.layover .wait { margin-left: 6px; color: var(--muted); }
+.layover .wait.long { color: var(--warn); }
+.leg-row .duration { margin-left: 8px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); font-size: 12px; }
