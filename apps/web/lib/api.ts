@@ -11,7 +11,14 @@ export async function api<T = any>(path: string, init: RequestInit & { json?: un
     body: json !== undefined ? JSON.stringify(json) : rest.body,
   });
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: any = null;
+  try { data = text ? JSON.parse(text) : null; } catch {
+    // not our API (proxy/host error page, API asleep or not configured) – never show raw parser errors
+    const ru = typeof document === 'undefined' || document.documentElement.lang !== 'en';
+    throw new ApiError(res.status, ru
+      ? 'Сервер недоступен. Попробуйте через минуту.'
+      : 'The server is unavailable. Please try again in a minute.');
+  }
   if (!res.ok) {
     const msg = Array.isArray(data?.message) ? data.message.join(', ') : data?.message ?? res.statusText;
     if (res.status === 401 && typeof window !== 'undefined' && !location.pathname.startsWith('/login') && !location.pathname.startsWith('/register')) {
