@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { api, Country, getCountries } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
+import { Flag } from './icons';
 
 type Mode = 'PLUS' | 'MINUS' | 'BOTH';
 export interface TrackerValues {
@@ -83,6 +84,7 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
     <form className="card" onSubmit={submit}>
       <div className="form-grid">
         <label className="field">{t.originCountry}
+          <span className="with-flag"><Flag code={v.originCountry} size="sm" />
           <select value={v.originCountry} onChange={(e) => {
             const c = countries.find((x) => x.code === e.target.value);
             setV((s) => ({
@@ -90,8 +92,8 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
               ...(s.destinationCountry === e.target.value ? { destinationCountry: '', destinationAirports: [] } : {}),
             }));
           }}>
-            {sorted.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.name[locale]}</option>)}
-          </select>
+            {sorted.map((c) => <option key={c.code} value={c.code}>{c.name[locale]}</option>)}
+          </select></span>
         </label>
         <label className="field">{t.originAirport}
           <select value={v.originAirport} onChange={(e) => set('originAirport', e.target.value)}>
@@ -100,10 +102,11 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
         </label>
         <label className="field">{t.destCountry}
           <input type="search" placeholder={t.searchCountry} value={q} onChange={(e) => setQ(e.target.value)} />
+          <span className={v.destinationCountry ? 'with-flag' : undefined}>{v.destinationCountry && <Flag code={v.destinationCountry} size="sm" />}
           <select required value={v.destinationCountry} onChange={(e) => setV((s) => ({ ...s, destinationCountry: e.target.value, destinationAirports: [] }))}>
             <option value="">{t.chooseCountry}</option>
-            {filtered.filter((c) => c.code !== v.originCountry).map((c) => <option key={c.code} value={c.code}>{c.flag} {c.name[locale]}</option>)}
-          </select>
+            {filtered.filter((c) => c.code !== v.originCountry).map((c) => <option key={c.code} value={c.code}>{c.name[locale]}</option>)}
+          </select></span>
         </label>
         <label className="field">{t.trackerName}<input maxLength={80} value={v.name} onChange={(e) => set('name', e.target.value)} /></label>
 

@@ -157,10 +157,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       else if (navigator.language && !navigator.language.startsWith('ru')) setLocaleState('en');
     } catch {}
   }, []);
+  useEffect(() => { document.documentElement.lang = locale; }, [locale]);
   const setLocale = (l: Locale) => {
     setLocaleState(l);
     try { localStorage.setItem('ff_locale', l); } catch {}
-    document.documentElement.lang = l;
   };
   return <Ctx.Provider value={{ t: dict[locale] as Dict, locale, setLocale }}>{children}</Ctx.Provider>;
 }

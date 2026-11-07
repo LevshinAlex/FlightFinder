@@ -56,7 +56,6 @@ small { display: block; font-size: 12px; }
   width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; color: #fff;
   background: linear-gradient(135deg, var(--btn-1), var(--btn-2)); box-shadow: var(--shadow-lg);
 }
-.brand-mark svg { transform: rotate(-45deg); }
 .brand-text b { display: block; font-size: 26px; line-height: 1; letter-spacing: -.03em; font-weight: 800; }
 .brand-text small { color: var(--muted); font-size: 11px; margin-top: 4px; font-weight: 600; }
 .nav-label { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin: 0 14px 12px; }
@@ -75,7 +74,7 @@ small { display: block; font-size: 12px; }
 .side-nav a:not(.on) .badge { background: var(--chip); color: var(--muted); }
 .sidebar-foot { margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
 .promo { background: linear-gradient(160deg, var(--primary-soft), var(--surface)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
-.promo-icon { font-size: 24px; display: block; margin-bottom: 10px; }
+.promo-icon { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 12px; background: var(--surface); color: var(--primary); box-shadow: 0 0 0 1px var(--border); }
 .promo b { display: block; font-size: 15px; margin-bottom: 6px; }
 .promo p { color: var(--muted); font-size: 12.5px; line-height: 1.55; }
 .user-card { display: flex; align-items: center; gap: 10px; padding: 14px 6px 0; border-top: 1px solid var(--border); }
@@ -109,7 +108,10 @@ small { display: block; font-size: 12px; }
 .icon-btn:hover { color: var(--text); background: var(--surface-2); text-decoration: none; }
 .icon-btn.bordered { border: 1px solid var(--border); background: var(--surface); width: 40px; height: 40px; }
 .icon-btn.sm { width: 34px; height: 34px; border-radius: 10px; }
-.lang-btn { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 800; color: var(--text); cursor: pointer; padding: 6px; }
+.lang-switch { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--chip); border: 1px solid var(--border); }
+.lang-switch button { border: 0; background: none; font: inherit; font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; padding: 5px 9px; border-radius: 8px; }
+.lang-switch button:hover { color: var(--text); }
+.lang-switch button.on { background: var(--surface); color: var(--primary); box-shadow: 0 1px 3px rgba(15, 27, 51, .12); }
 .only-mobile { display: none; }
 .scrim { display: none; }
 
@@ -318,3 +320,9 @@ table.trackers tbody tr:hover { background: var(--surface-2); }
 .auth > p { margin: 18px 0; }
 .auth > p:last-child, .auth .card + p, .auth .card + div { margin-top: 16px; text-align: center; }
 form.card > p.small { margin: 20px 0 14px; }
+
+/* flag inside a country select (native <option> can't show images) */
+.field > span { display: block; }
+.with-flag { position: relative; }
+.with-flag .flag-tile { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); pointer-events: none; border: 0; background: none; }
+.with-flag select { padding-left: 40px; }

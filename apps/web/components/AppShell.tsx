@@ -6,12 +6,19 @@ import { api } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
 import { IconBell, IconClose, IconGear, IconGrid, IconLogout, IconMenu, IconPlane } from './icons';
 
-export function LangSwitch({ className = 'lang-btn' }: { className?: string }) {
+/** Both languages visible, the current one highlighted – a single "RU"/"EN" button was ambiguous
+ *  (does it show the current language or the one it switches to?). */
+export function LangSwitch() {
   const { locale, setLocale } = useI18n();
   return (
-    <button className={className} onClick={() => setLocale(locale === 'ru' ? 'en' : 'ru')} aria-label="Language" title={locale === 'ru' ? 'English' : 'Русский'}>
-      {locale.toUpperCase()}
-    </button>
+    <div className="lang-switch" role="group" aria-label="Language / Язык">
+      {(['ru', 'en'] as const).map((l) => (
+        <button key={l} className={locale === l ? 'on' : ''} aria-pressed={locale === l} onClick={() => setLocale(l)}
+          title={l === 'ru' ? 'Русский' : 'English'} lang={l}>
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -89,7 +96,7 @@ export default function AppShell({ children, crumb }: { children: ReactNode; cru
         </nav>
         <div className="sidebar-foot">
           <div className="promo">
-            <span className="promo-icon">✈️</span>
+            <span className="promo-icon"><IconPlane size={20} /></span>
             <b>{t.dreamTitle}</b>
             <p>{t.dreamText}</p>
           </div>
