@@ -22,6 +22,9 @@ export const config = {
     travelpayoutsMarker: process.env.TRAVELPAYOUTS_MARKER ?? '',
     duffelToken: process.env.DUFFEL_ACCESS_TOKEN ?? '',
     skyscannerKey: process.env.SKYSCANNER_API_KEY ?? '',
+    serpapiKey: process.env.SERPAPI_KEY ?? '',
+    ignavKey: process.env.IGNAV_API_KEY ?? '',
+    hasdataKey: process.env.HASDATA_API_KEY ?? '',
   },
   email: {
     transport: process.env.EMAIL_TRANSPORT ?? 'console',

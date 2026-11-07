@@ -96,9 +96,24 @@ npm test
 | Переменная | Значения |
 |---|---|
 | `INDICATIVE_PROVIDER` | `mock` \| `travelpayouts` |
-| `LIVE_PROVIDER` | `mock` \| `duffel` |
+| `LIVE_PROVIDER` | `mock` \| `duffel` \| `serpapi` \| `ignav` \| `hasdata` |
 | `TRAVELPAYOUTS_TOKEN`, `TRAVELPAYOUTS_MARKER` | Aviasales Data API |
 | `DUFFEL_ACCESS_TOKEN` | Duffel Air API |
+| `SERPAPI_KEY` | SerpApi, Google Flights — бесплатно 250 поисков/мес |
+| `IGNAV_API_KEY` | Ignav — бесплатно 1000 запросов |
+| `HASDATA_API_KEY` | HasData, Google Flights — бесплатно 1000 кредитов/мес (~66 запросов) |
+
+Бесплатные live-поставщики (`serpapi`, `ignav`, `hasdata`) подходят для прототипа и проверки,
+но не для ежедневной работы: один мониторинг — это до `LIVE_CHECK_TOP_N` + по одной проверке
+на аэропорт в день. Для них уменьшите `LIVE_CHECK_TOP_N` (например, до 2–3).
+
+- **SerpApi / HasData** — цены Google Flights на момент запроса. Обратный рейс в Google
+  запрашивается отдельно, поэтому одна live-проверка = **2 запроса**, и проверяется только самый
+  дешёвый вылет туда. HasData не документирует значения `stops`/`travelClass`: пересадки
+  фильтруются по реальным сегментам, поддерживается только эконом.
+- **Ignav** — туда-обратно одним запросом. Валюта задаётся рынком (`ILS→IL`, `USD→US`,
+  `GBP→GB`, `EUR→DE`); если поставщик ответил в другой валюте, проверка завершается ошибкой,
+  а не пересчётом. Цена со статусом `verified` → `LIVE`, иначе `INDICATIVE`.
 
 Skyscanner — заготовка адаптера до получения партнёрского доступа. Перед выбором поставщика
 пройдите чек-лист в [docs/PROVIDER_EVALUATION.md](docs/PROVIDER_EVALUATION.md).

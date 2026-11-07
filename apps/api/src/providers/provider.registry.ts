@@ -5,6 +5,9 @@ import { MockFlightProvider } from './mock.provider';
 import { TravelpayoutsProvider } from './travelpayouts.provider';
 import { DuffelProvider } from './duffel.provider';
 import { SkyscannerProvider } from './skyscanner.provider';
+import { SerpApiProvider } from './serpapi.provider';
+import { IgnavProvider } from './ignav.provider';
+import { HasDataProvider } from './hasdata.provider';
 
 @Injectable()
 export class ProviderRegistry {
@@ -13,6 +16,9 @@ export class ProviderRegistry {
     travelpayouts: new TravelpayoutsProvider(),
     duffel: new DuffelProvider(),
     skyscanner: new SkyscannerProvider(),
+    serpapi: new SerpApiProvider(),
+    ignav: new IgnavProvider(),
+    hasdata: new HasDataProvider(),
   };
 
   get(name: string): FlightProvider {
