@@ -9,16 +9,12 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt.guard';
 import { config } from './common/config';
+import { redisConnection } from './common/redis';
 import { NotificationModule } from './notifications/notification.module';
 import { PrismaModule } from './prisma/prisma.service';
 import { SearchModule } from './search/search.module';
 import { TrackersModule } from './trackers/trackers.module';
 import { UsersController } from './users/users.controller';
-
-export const redisConnection = () => {
-  const u = new URL(config.redisUrl);
-  return { host: u.hostname, port: Number(u.port || 6379), password: u.password || undefined, username: u.username || undefined };
-};
 
 export const JwtGlobal = JwtModule.register({ global: true, secret: config.jwtSecret, signOptions: { expiresIn: '30d' } });
 

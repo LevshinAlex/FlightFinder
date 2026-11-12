@@ -16,6 +16,9 @@ function hash(s: string): number {
   return (h >>> 0) / 4294967295;
 }
 
+/** Demo base prices are on a shekel scale. */
+const CURRENCY_SCALE: Record<string, number> = { ILS: 1, USD: 0.27, EUR: 0.25, GBP: 0.21 };
+
 export class MockFlightProvider implements FlightProvider {
   readonly name = 'mock';
   readonly capabilities: ProviderCapabilities = { indicativePrices: true, liveSearch: true, flightDetails: false, bookingLink: true };
@@ -33,7 +36,8 @@ export class MockFlightProvider implements FlightProvider {
     const inboundStops = Math.floor(hash(key + 'i') * 3);
     const stopsDiscount = 1 - 0.08 * (outboundStops + inboundStops);
     const indicativeNoise = status === 'INDICATIVE' ? 0.95 + hash(key + 'n') * 0.1 : 1;
-    const price = Math.round(base * dateFactor * daily * stopsDiscount * indicativeNoise * c.adults);
+    const scale = CURRENCY_SCALE[c.currency.toUpperCase()] ?? 1; // demo prices look plausible in any currency
+    const price = Math.round(base * dateFactor * daily * stopsDiscount * indicativeNoise * c.adults * scale);
     const dur = Math.round(180 + hash(c.destination + 'd') * 600);
     return {
       provider: this.name,
@@ -58,6 +62,12 @@ export class MockFlightProvider implements FlightProvider {
     if (this.failureRate > 0 && Math.random() < this.failureRate) throw new ProviderUnavailableError(this.name, 'simulated outage');
   }
 
+  /** MOCK_LATENCY_MS: simulate a real provider's response time (demo / UI checks); 0 by default. */
+  private async latency() {
+    const ms = Number(process.env.MOCK_LATENCY_MS ?? 0);
+    if (ms > 0) await new Promise((r) => setTimeout(r, ms));
+  }
+
   async getIndicativePrices(c: IndicativeCriteria): Promise<ProviderOffer[]> {
     this.maybeFail();
     const out: ProviderOffer[] = [];
@@ -70,6 +80,7 @@ export class MockFlightProvider implements FlightProvider {
   }
 
   async searchFlights(c: SearchCriteria): Promise<ProviderOffer[]> {
+    await this.latency();
     this.maybeFail();
     return [0, 1, 2, 3].map((v) => this.offer(c, v, 'LIVE'));
   }

@@ -14,14 +14,14 @@ export default function EditTracker({ params }: { params: { id: string } }) {
       name: d.name ?? '', originCountry: d.originCountry, originAirport: d.originAirport, destinationCountry: d.destinationCountry,
       destinationAirports: d.destinationAirports, departureDate: d.departureDate, returnDate: d.returnDate,
       departureFlexDays: d.departureFlexDays, departureFlexMode: d.departureFlexMode, returnFlexDays: d.returnFlexDays, returnFlexMode: d.returnFlexMode,
-      maxStops: d.maxStops, adults: d.adults, cabinClass: d.cabinClass, currency: d.currency,
+      maxStops: d.maxStops, adults: d.adults, cabinClass: d.cabinClass, currency: 'USD',
       targetPrice: d.targetPrice != null ? String(d.targetPrice) : '', significantChangePct: d.significantChangePct,
     })).catch((e) => setError(e.message));
   }, [params.id]);
   return (
     <AppShell crumb={t.editTracker}>
       <PageHeader title={t.editTracker} />
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
       {v && <TrackerForm initial={v} trackerId={params.id} />}
     </AppShell>
   );

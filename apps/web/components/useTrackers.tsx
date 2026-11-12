@@ -13,7 +13,7 @@ export function useTrackers() {
   const load = useCallback(() => api<any[]>('/trackers').then((l) => { setItems(l); setTrackerCount(l.length); }).catch((e) => setError(e.message)), []);
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
-    if (!items?.some((i) => i.lastRun && ['QUEUED', 'RUNNING'].includes(i.lastRun.status))) return;
+    if (!items?.some((i) => i.inProgress)) return;
     const id = setInterval(load, 4000);
     return () => clearInterval(id);
   }, [items, load]);

@@ -37,7 +37,7 @@ export default function Dashboard() {
     return { text: money(min, cur, locale), mixed: byCur.size > 1, cur };
   }, [items, locale]);
 
-  const active = items?.filter((i) => i.status === 'ACTIVE').length ?? 0;
+  const active = items?.filter((i) => i.status === 'ACTIVE' && !i.expired).length ?? 0;
 
   return (
     <AppShell crumb={t.dashboard}>
@@ -65,7 +65,7 @@ export default function Dashboard() {
         <Stat label={t.statUpdate} value={t.daily} sub={reportTime ? t.statUpdateSubAt(reportTime) : t.statUpdateSub} icon={<IconClock />} tone="amber" />
       </div>
 
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
       {items && <TrackerTable items={items} reload={load} />}
       {!items && !error && <div className="card skeleton" />}
     </AppShell>

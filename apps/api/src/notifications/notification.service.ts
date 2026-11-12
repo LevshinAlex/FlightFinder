@@ -5,6 +5,7 @@ import { AirportsService, flagEmoji } from '../airports/airports.service';
 import { config } from '../common/config';
 import { toIsoDate } from '../common/dates';
 import { PrismaService } from '../prisma/prisma.service';
+import { hasSearchableDates } from '../search/date-combinations';
 import { EmailChannel } from './channels/email.channel';
 import { WhatsAppChannel } from './channels/whatsapp.channel';
 import { buildDailyReport, buildPriceDropAlert, Locale, ReportItem } from './report-builder';
@@ -75,7 +76,7 @@ export class NotificationService {
     const locale = (user.locale === 'en' ? 'en' : 'ru') as Locale;
     const tz = prefs?.timezone ?? user.timezone;
     const dayStart = DateTime.fromISO(reportDate, { zone: tz }).startOf('day').toJSDate();
-    const active = user.trackers.filter((t) => toIsoDate(t.returnDate) >= reportDate);
+    const active = user.trackers.filter((t) => hasSearchableDates(t)); // same set the scheduler searched
     const items = await Promise.all(active.map((t) => this.item(t.id, locale, dayStart)));
     if (!items.length) return { skipped: 'no active trackers' };
     const report = buildDailyReport(items, reportDate, locale);

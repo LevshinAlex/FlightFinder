@@ -1,6 +1,7 @@
 import { Controller, ForbiddenException, Get, UseGuards } from '@nestjs/common';
 import { CurrentUser, JwtAuthGuard } from '../auth/jwt.guard';
 import { PrismaService } from '../prisma/prisma.service';
+import { providerBudget } from '../providers/budget';
 import { ProviderRegistry } from '../providers/provider.registry';
 
 const ADMINS = (process.env.ADMIN_EMAILS ?? '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
@@ -34,6 +35,8 @@ export class AdminController {
       searchRuns24h: runs.map((r) => ({ status: r.status, count: r._count })),
       notifications24h: notif.map((n) => ({ channel: n.channel, status: n.status, count: n._count })),
       providers: await Promise.all(this.providers.list().map((p) => p.getProviderStatus())),
+      // free-tier quotas: used this month / today, what today may still spend, paused providers
+      quotas: await providerBudget.status(this.providers.list().map((p) => p.name)),
     };
   }
 }

@@ -17,6 +17,7 @@ import { providerFetch } from './http';
 export class HasDataProvider implements FlightProvider {
   readonly name = 'hasdata';
   readonly capabilities: ProviderCapabilities = { indicativePrices: false, liveSearch: true, flightDetails: false, bookingLink: true };
+  readonly requestsPerLiveCheck = 2; // outbound page + return page
   private base = 'https://api.hasdata.com/scrape/google/flights';
 
   private get key() {
@@ -31,7 +32,7 @@ export class HasDataProvider implements FlightProvider {
       adults: String(c.adults), currency: c.currency.toUpperCase(), hl: 'en',
     });
     if (departureToken) qs.set('departureToken', departureToken);
-    return providerFetch(this.name, `${this.base}?${qs}`, { headers: { 'x-api-key': this.key } }, 90000);
+    return providerFetch(this.name, `${this.base}?${qs}`, { headers: { 'x-api-key': this.key } });
   }
 
   async searchFlights(c: SearchCriteria): Promise<ProviderOffer[]> {

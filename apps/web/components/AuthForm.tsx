@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
-import { Brand, LangSwitch } from './AppShell';
+import { Brand, LangSwitch, resetSessionCache } from './AppShell';
 
 export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const { t, locale } = useI18n();
@@ -22,10 +22,10 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     setBusy(true); setError('');
     try {
       await api(`/auth/${mode}`, { method: 'POST', json: mode === 'login' ? { email, password } : { email, password, name: name || undefined, locale } });
-      router.push('/dashboard');
+      resetSessionCache();
+      router.push('/dashboard'); // stays busy while navigating – no second submit
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setBusy(false);
     }
   };
@@ -37,14 +37,16 @@ export default function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         <p className="muted">{t.tagline}</p>
         <div className="card">
           <form onSubmit={submit}>
-            <label className="field">{t.email}<input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+            <label className="field">{t.email}<input type="email" name="email" required autoComplete="email" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} /></label>
             <label className="field">{t.password}
-              <input type="password" required minLength={mode === 'register' ? 8 : 1} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" name="password" required minLength={mode === 'register' ? 8 : 1} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(e) => setPassword(e.target.value)} />
               {mode === 'register' && <span className="small">{t.passwordHint}</span>}
             </label>
-            {mode === 'register' && <label className="field">{t.name}<input value={name} onChange={(e) => setName(e.target.value)} /></label>}
-            {error && <div className="error">{error}</div>}
-            <button className="btn primary" disabled={busy}>{mode === 'login' ? t.login : t.register}</button>
+            {mode === 'register' && <label className="field">{t.name}<input name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} /></label>}
+            {error && <div className="error" role="alert">{error}</div>}
+            <button className="btn primary" disabled={busy}>
+              {busy ? (mode === 'login' ? t.signingIn : t.creatingAccount) : mode === 'login' ? t.login : t.register}
+            </button>
             {google && <a className="btn" href="/api/auth/google">{t.google}</a>}
           </form>
         </div>

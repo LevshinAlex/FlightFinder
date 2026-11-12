@@ -4,19 +4,28 @@ import { Cron } from '@nestjs/schedule';
 import { Queue } from 'bullmq';
 import { DateTime } from 'luxon';
 import { PrismaService } from '../prisma/prisma.service';
+import { hasSearchableDates } from '../search/date-combinations';
 import { NOTIFY_QUEUE, NotifyJob } from '../search/queues';
+import { activeRunWhere, failUnfinishedRuns, staleCutoff } from '../search/run-state';
 import { SearchQueueService } from '../search/search-queue.service';
 
 /** Search starts this many minutes before the user's report time (spec 4.1). */
 export const SEARCH_LEAD_MINUTES = 60;
 /** If searches are still running this long after report time, send the report anyway. */
 export const REPORT_GRACE_MINUTES = 45;
+/** Shorter than the 5-minute tick: one worker per tick, and a crashed worker never blocks the next tick. */
+const TICK_LOCK_MS = 4 * 60_000;
+
+const TRACKER_DATES = {
+  id: true, departureDate: true, departureFlexDays: true, departureFlexMode: true, returnDate: true, returnFlexDays: true, returnFlexMode: true,
+} as const;
 
 /**
  * Runs inside the worker process every 5 minutes:
+ *  - fails search runs left without a worker (crash / deploy / sleep) – see run-state.ts
  *  - starts the daily search batch for users whose report time is approaching
  *  - sends the daily summary once their searches have finished
- * Idempotent: safe to run repeatedly / on several workers.
+ * Idempotent: safe to run repeatedly; a Redis lock lets only one of several workers run a tick.
  */
 @Injectable()
 export class SchedulerService {
@@ -34,6 +43,8 @@ export class SchedulerService {
     if (this.running) return;
     this.running = true;
     try {
+      if (!(await this.claimTick())) return;
+      await this.failStaleRuns(now);
       await this.scheduleSearches(now);
       await this.scheduleReports(now);
     } catch (e: any) {
@@ -41,6 +52,17 @@ export class SchedulerService {
     } finally {
       this.running = false;
     }
+  }
+
+  /** The in-process `running` flag only guards one process; several workers would otherwise all schedule the same batch. */
+  private async claimTick(): Promise<boolean> {
+    const redis = await this.notify.client;
+    return (await redis.set('ff:scheduler:tick', String(process.pid), 'PX', TICK_LOCK_MS, 'NX')) === 'OK';
+  }
+
+  async failStaleRuns(now: DateTime) {
+    const { count } = await failUnfinishedRuns(this.prisma, { startedAt: { lt: staleCutoff(now.toJSDate()) } });
+    if (count) this.log.warn(`${count} stale search run(s) marked FAILED`);
   }
 
   private localTimes(tz: string, preferredTime: string, now: DateTime) {
@@ -53,16 +75,16 @@ export class SchedulerService {
   async scheduleSearches(now: DateTime) {
     const users = await this.prisma.user.findMany({
       where: { trackers: { some: { status: 'ACTIVE' } } },
-      include: { preferences: true, trackers: { where: { status: 'ACTIVE' }, select: { id: true, returnDate: true } } },
+      include: { preferences: true, trackers: { where: { status: 'ACTIVE' }, select: TRACKER_DATES } },
     });
+    const today = now.toUTC().toISODate()!; // the engine's notion of "past" dates
     const due: string[] = [];
     for (const u of users) {
       const p = u.preferences ?? { timezone: u.timezone, preferredTime: '07:00' };
       const { local, searchAt, dayStart } = this.localTimes(p.timezone, p.preferredTime, now);
       if (local < searchAt) continue;
-      const todayIso = local.toISODate()!;
-      // skip trips that are already over
-      const trackerIds = u.trackers.filter((t) => t.returnDate.toISOString().slice(0, 10) >= todayIso).map((t) => t.id);
+      // skip trips whose dates have passed – there is nothing left to search
+      const trackerIds = u.trackers.filter((t) => hasSearchableDates(t, today)).map((t) => t.id);
       if (!trackerIds.length) continue;
       const done = await this.prisma.searchRun.findMany({
         where: { trackerId: { in: trackerIds }, trigger: 'SCHEDULED', startedAt: { gte: dayStart.toJSDate() } },
@@ -83,19 +105,23 @@ export class SchedulerService {
   async scheduleReports(now: DateTime) {
     const users = await this.prisma.user.findMany({
       where: { trackers: { some: { status: 'ACTIVE' } }, preferences: { dailySummaryEnabled: true } },
-      include: { preferences: true, trackers: { where: { status: 'ACTIVE' }, select: { id: true } } },
+      include: { preferences: true, trackers: { where: { status: 'ACTIVE' }, select: TRACKER_DATES } },
     });
+    const today = now.toUTC().toISODate()!;
     for (const u of users) {
       const p = u.preferences!;
       const { local, report, dayStart } = this.localTimes(p.timezone, p.preferredTime, now);
       if (local < report) continue;
+      // same trackers as the search and the summary use – a user whose trips are all over has no report
+      const trackerIds = u.trackers.filter((t) => hasSearchableDates(t, today)).map((t) => t.id);
+      if (!trackerIds.length) continue;
       const reportDate = local.toISODate()!;
       const already = await this.prisma.notificationLog.findFirst({
         where: { userId: u.id, kind: 'DAILY_SUMMARY', dedupeKey: { startsWith: `DAILY_SUMMARY:${u.id}:${reportDate}` } },
       });
       if (already) continue;
       const pending = await this.prisma.searchRun.count({
-        where: { trackerId: { in: u.trackers.map((t) => t.id) }, trigger: 'SCHEDULED', startedAt: { gte: dayStart.toJSDate() }, status: { in: ['QUEUED', 'RUNNING'] } },
+        where: { AND: [activeRunWhere(now.toJSDate()), { trackerId: { in: trackerIds }, trigger: 'SCHEDULED', startedAt: { gte: dayStart.toJSDate() } }] },
       });
       if (pending > 0 && local < report.plus({ minutes: REPORT_GRACE_MINUTES })) continue;
       await this.notify.add('daily-summary', { type: 'daily-summary', userId: u.id, reportDate }, {

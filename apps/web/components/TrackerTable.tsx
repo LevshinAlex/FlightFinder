@@ -8,32 +8,53 @@ import { TrendPill } from './Trend';
 
 type Tracker = any;
 
+/** ACTIVE / PAUSED, plus the derived "dates passed" state – an active tracker with nothing left to search. */
+export function StatusPill({ tr }: { tr: Tracker }) {
+  const { t } = useI18n();
+  if (tr.expired) return <span className="pill" title={t.expiredHint}><i />{t.expired}</span>;
+  const active = tr.status === 'ACTIVE';
+  return <span className={`pill ${active ? 'ok' : 'paused'}`}><i />{active ? t.active : t.paused}</span>;
+}
+
 function RowMenu({ tr, onAction }: { tr: Tracker; onAction: (a: 'pause' | 'resume' | 'delete') => void }) {
   const { t } = useI18n();
-  const [open, setOpen] = useState(false);
-  const [confirming, setConfirming] = useState(false);
+  // One state instead of two booleans: every way of closing returns to 'closed', so the menu can
+  // never reopen with "Confirm delete" already armed (one click from deleting).
+  const [menu, setMenu] = useState<'closed' | 'open' | 'confirmDelete'>('closed');
+  const open = menu !== 'closed';
   const ref = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const list = useRef<HTMLDivElement>(null);
+  const armedAt = useRef(0);
   useEffect(() => {
     if (!open) return;
-    const close = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) { setOpen(false); setConfirming(false); } };
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { setOpen(false); setConfirming(false); } };
+    const close = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setMenu('closed'); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMenu('closed'); trigger.current?.focus(); } };
     document.addEventListener('mousedown', close);
     document.addEventListener('keydown', esc);
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc); };
   }, [open]);
+  // keyboard: opening moves focus to the first action (Tab walks the rest, Escape returns to the button)
+  useEffect(() => { if (menu === 'open') list.current?.querySelector<HTMLElement>('a, button')?.focus(); }, [menu]);
+  const choose = (a: 'pause' | 'resume' | 'delete') => { setMenu('closed'); onAction(a); };
   const active = tr.status === 'ACTIVE';
+  const listId = `actions-${tr.id}`;
   return (
     <div className="menu-wrap" ref={ref}>
-      <button className="icon-btn bordered sm" aria-haspopup="menu" aria-expanded={open} aria-label={t.more} onClick={() => setOpen((o) => !o)}>
+      {/* a disclosure, not an ARIA menu: plain buttons/links that Tab reaches – no arrow-key contract to break */}
+      <button ref={trigger} className="icon-btn bordered sm" aria-expanded={open} aria-controls={listId} aria-label={t.more}
+        onClick={() => setMenu(open ? 'closed' : 'open')}>
         <IconDots size={18} />
       </button>
       {open && (
-        <div className="menu" role="menu">
-          <Link role="menuitem" href={`/trackers/${tr.id}/edit`}>{t.edit}</Link>
-          <button role="menuitem" onClick={() => { setOpen(false); onAction(active ? 'pause' : 'resume'); }}>{active ? t.pause : t.resume}</button>
-          {confirming
-            ? <button role="menuitem" className="danger strong" onClick={() => { setOpen(false); onAction('delete'); }}>{t.confirmDeleteShort}</button>
-            : <button role="menuitem" className="danger" onClick={() => setConfirming(true)}>{t.delete}</button>}
+        <div className="menu" id={listId} ref={list}>
+          <Link href={`/trackers/${tr.id}/edit`}>{t.edit}</Link>
+          <button onClick={() => choose(active ? 'pause' : 'resume')}>{active ? t.pause : t.resume}</button>
+          {/* the same button arms and then confirms: focus stays on it, and a held/repeated Enter can't confirm at once */}
+          <button className={menu === 'confirmDelete' ? 'danger strong' : 'danger'} onClick={() => {
+            if (menu !== 'confirmDelete') { armedAt.current = Date.now(); setMenu('confirmDelete'); }
+            else if (Date.now() - armedAt.current > 400) choose('delete');
+          }}>{menu === 'confirmDelete' ? t.confirmDeleteShort : t.delete}</button>
         </div>
       )}
     </div>
@@ -45,6 +66,7 @@ export default function TrackerTable({ items, reload }: { items: Tracker[]; relo
   const [q, setQ] = useState('');
   const [status, setStatus] = useState<'ALL' | 'ACTIVE' | 'PAUSED'>('ALL');
   const [countries, setCountries] = useState<Country[]>([]);
+  const [actionError, setActionError] = useState('');
   useEffect(() => { getCountries().then(setCountries).catch(() => {}); }, []);
 
   const subtitle = (tr: Tracker) => {
@@ -63,7 +85,12 @@ export default function TrackerTable({ items, reload }: { items: Tracker[]; relo
   }, [items, q, status]);
 
   const act = async (id: string, action: 'pause' | 'resume' | 'delete') => {
-    await api(`/trackers/${id}${action === 'delete' ? '' : `/${action}`}`, { method: action === 'delete' ? 'DELETE' : 'POST' });
+    setActionError('');
+    try {
+      await api(`/trackers/${id}${action === 'delete' ? '' : `/${action}`}`, { method: action === 'delete' ? 'DELETE' : 'POST' });
+    } catch (e: any) {
+      setActionError(e.message); // the row keeps showing the real (unchanged) state after the reload
+    }
     reload();
   };
 
@@ -77,7 +104,7 @@ export default function TrackerTable({ items, reload }: { items: Tracker[]; relo
         <div className="filters">
           <label className="search">
             <IconSearch size={17} />
-            <input type="search" placeholder={t.searchDirection} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t.searchDirection} />
+            <input type="search" placeholder={`${t.searchDirection}…`} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t.searchDirection} />
           </label>
           <select value={status} onChange={(e) => setStatus(e.target.value as any)} aria-label={t.status}>
             <option value="ALL">{t.allStatuses}</option>
@@ -87,6 +114,7 @@ export default function TrackerTable({ items, reload }: { items: Tracker[]; relo
         </div>
       </div>
 
+      {actionError && <div className="error" role="alert">{actionError}</div>}
       <div className="table-wrap">
         <table className="trackers">
           <thead>
@@ -97,7 +125,7 @@ export default function TrackerTable({ items, reload }: { items: Tracker[]; relo
           </thead>
           <tbody>
             {rows.map((i) => {
-              const running = i.lastRun && ['QUEUED', 'RUNNING'].includes(i.lastRun.status);
+              const running = i.inProgress; // decided by the API (ignores runs whose worker died)
               const failed = i.lastRun?.status === 'FAILED';
               return (
                 <tr key={i.id}>
@@ -126,7 +154,7 @@ export default function TrackerTable({ items, reload }: { items: Tracker[]; relo
                     <small className={failed ? 'bad' : 'muted'}>{failed ? t.checkFailed : t.lastSearch}</small>
                   </td>
                   <td className="hide-sm">
-                    <span className={`pill ${i.status === 'ACTIVE' ? 'ok' : 'paused'}`}><i />{i.status === 'ACTIVE' ? t.active : t.paused}</span>
+                    <StatusPill tr={i} />
                   </td>
                   <td className="right">
                     <div className="row-actions">

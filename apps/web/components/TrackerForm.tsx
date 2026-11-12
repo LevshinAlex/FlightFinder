@@ -1,6 +1,7 @@
 'use client';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { api, Country, getCountries } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
 import { Flag } from './icons';
@@ -20,7 +21,7 @@ const plusDays = (n: number) => {
 export const defaults = (): TrackerValues => ({
   name: '', originCountry: 'IL', originAirport: 'TLV', destinationCountry: '', destinationAirports: [],
   departureDate: plusDays(60), returnDate: plusDays(70), departureFlexDays: 2, departureFlexMode: 'PLUS', returnFlexDays: 2, returnFlexMode: 'MINUS',
-  maxStops: 1, adults: 1, cabinClass: 'ECONOMY', currency: 'ILS', targetPrice: '', significantChangePct: 2,
+  maxStops: 1, adults: 1, cabinClass: 'ECONOMY', currency: 'USD', targetPrice: '', significantChangePct: 2, // all prices are in USD
 });
 
 const FLEX = ['0:PLUS', '1:PLUS', '2:PLUS', '3:PLUS', '1:MINUS', '2:MINUS', '3:MINUS', '1:BOTH', '2:BOTH', '3:BOTH'];
@@ -64,6 +65,21 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
     return deps.reduce((n, d) => n + rets.filter((r) => r > d).length, 0);
   }, [v.departureDate, v.returnDate, v.departureFlexDays, v.departureFlexMode, v.returnFlexDays, v.returnFlexMode]);
 
+  // No valid date pair is not a native constraint – make it one, so the browser shows it at the field and
+  // focuses it on submit (instead of a silently disabled Save button). The destination is `required`.
+  const retRef = useRef<HTMLInputElement>(null);
+  const datesError = v.departureDate && v.returnDate && combos === 0 ? t.errDates : '';
+  useEffect(() => { retRef.current?.setCustomValidity(datesError); }, [datesError]);
+
+  // closing / reloading the tab with unsaved edits asks first (client-side links are not covered by the browser)
+  const dirty = useMemo(() => JSON.stringify(v) !== JSON.stringify(initial), [v, initial]);
+  useEffect(() => {
+    if (!dirty || busy) return;
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty, busy]);
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true); setError('');
@@ -100,15 +116,33 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
             {origin?.airports.map((a) => <option key={a.iata} value={a.iata}>{a.city[locale]} — {a.iata}</option>)}
           </select>
         </label>
-        <label className="field">{t.destCountry}
-          <input type="search" placeholder={t.searchCountry} value={q} onChange={(e) => setQ(e.target.value)} />
+        {/* one label per control: the visible label names the select, the search box has its own */}
+        <div className="field">
+          <label htmlFor="dest-country">{t.destCountry}</label>
+          <input type="search" aria-label={t.searchCountry} placeholder={t.searchCountry} value={q} onChange={(e) => setQ(e.target.value)} />
           <span className={v.destinationCountry ? 'with-flag' : undefined}>{v.destinationCountry && <Flag code={v.destinationCountry} size="sm" />}
-          <select required value={v.destinationCountry} onChange={(e) => setV((s) => ({ ...s, destinationCountry: e.target.value, destinationAirports: [] }))}>
+          <select id="dest-country" required value={v.destinationCountry} onChange={(e) => setV((s) => ({ ...s, destinationCountry: e.target.value, destinationAirports: [] }))}>
             <option value="">{t.chooseCountry}</option>
             {filtered.filter((c) => c.code !== v.originCountry).map((c) => <option key={c.code} value={c.code}>{c.name[locale]}</option>)}
           </select></span>
-        </label>
-        <label className="field">{t.trackerName}<input maxLength={80} value={v.name} onChange={(e) => set('name', e.target.value)} /></label>
+        </div>
+        {/* destination airports right under the destination country (full-width row of the grid) */}
+        {dest && (
+          <div className="dest-airports">
+            <div className="small muted" style={{ marginBottom: 6 }}>{t.destAirports}</div>
+            <label className="check" style={{ marginBottom: 6 }}>
+              <input type="checkbox" checked={v.destinationAirports.length === 0} onChange={() => set('destinationAirports', [])} /> {t.allAirports} ({dest.airports.length})
+            </label>
+            <div className="airport-list">
+              {dest.airports.map((a) => (
+                <label key={a.iata} className="check small">
+                  <input type="checkbox" checked={v.destinationAirports.includes(a.iata)} onChange={() => toggleAirport(a.iata)} />
+                  {a.city[locale]} ({a.iata})
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
 
         <label className="field">{t.departureDate}<input type="date" required value={v.departureDate} onChange={(e) => set('departureDate', e.target.value)} /></label>
         <label className="field">{t.depFlex}
@@ -116,7 +150,11 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
             {FLEX.map((f) => <option key={f} value={f}>{flexLabel(f, t.exact)}</option>)}
           </select>
         </label>
-        <label className="field">{t.returnDate}<input type="date" required min={v.departureDate} value={v.returnDate} onChange={(e) => set('returnDate', e.target.value)} /></label>
+        <label className="field">{t.returnDate}
+          <input ref={retRef} type="date" required min={v.departureDate} value={v.returnDate} onChange={(e) => set('returnDate', e.target.value)}
+            aria-invalid={!!datesError} aria-describedby={datesError ? 'dates-error' : undefined} />
+          {datesError && <span className="field-error" id="dates-error">{datesError}</span>}
+        </label>
         <label className="field">{t.retFlex}
           <select value={`${v.returnFlexDays}:${v.returnFlexMode}`} onChange={(e) => { const [n, m] = e.target.value.split(':'); setV((s) => ({ ...s, returnFlexDays: +n, returnFlexMode: m as Mode })); }}>
             {FLEX.map((f) => <option key={f} value={f}>{flexLabel(f, t.exact)}</option>)}
@@ -134,37 +172,21 @@ export default function TrackerForm({ initial, trackerId }: { initial: TrackerVa
             {['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST'].map((c) => <option key={c} value={c}>{(t as any)[c]}</option>)}
           </select>
         </label>
-        <label className="field">{t.currency}
-          <select value={v.currency} onChange={(e) => set('currency', e.target.value)}>
-            {['ILS', 'USD', 'EUR', 'GBP'].map((c) => <option key={c}>{c}</option>)}
-          </select>
+        <label className="field" title={t.usdOnly}>{t.currency}
+          <input value="USD ($)" disabled />
         </label>
-        <label className="field">{t.targetPrice}<input type="number" min={1} value={v.targetPrice} onChange={(e) => set('targetPrice', e.target.value)} /></label>
+        <label className="field">{t.targetPrice}<input type="number" min={1} step="0.01" inputMode="decimal" value={v.targetPrice} onChange={(e) => set('targetPrice', e.target.value)} /></label>
         <label className="field">{t.threshold}<input type="number" min={0} max={50} step={0.5} value={v.significantChangePct} onChange={(e) => set('significantChangePct', +e.target.value)} /></label>
+        {/* optional, next to the other optional settings */}
+        <label className="field">{t.trackerName}<input maxLength={80} value={v.name} onChange={(e) => set('name', e.target.value)} /></label>
       </div>
 
-      {dest && (
-        <div style={{ marginTop: 16 }}>
-          <div className="small muted" style={{ marginBottom: 6 }}>{t.destAirports}</div>
-          <label className="check" style={{ marginBottom: 6 }}>
-            <input type="checkbox" checked={v.destinationAirports.length === 0} onChange={() => set('destinationAirports', [])} /> {t.allAirports} ({dest.airports.length})
-          </label>
-          <div className="airport-list">
-            {dest.airports.map((a) => (
-              <label key={a.iata} className="check small">
-                <input type="checkbox" checked={v.destinationAirports.includes(a.iata)} onChange={() => toggleAirport(a.iata)} />
-                {a.city[locale]} ({a.iata})
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
       <p className="small muted">{t.combos(combos)}{dest ? ` × ${v.destinationAirports.length || dest.airports.length} ✈` : ''}</p>
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
       <div className="row">
-        <button className="btn primary" disabled={busy || !v.destinationCountry || combos === 0}>{trackerId ? t.saveChanges : t.save}</button>
-        <button type="button" className="btn" onClick={() => router.back()}>{t.cancel}</button>
+        <button className="btn primary" disabled={busy}>{busy ? t.saving : trackerId ? t.saveChanges : t.save}</button>
+        {/* a real link: works when the form was opened directly (router.back() would leave the app) */}
+        <Link className="btn" href={trackerId ? `/trackers/${trackerId}` : '/dashboard'}>{t.cancel}</Link>
       </div>
     </form>
   );

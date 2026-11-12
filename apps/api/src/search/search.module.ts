@@ -10,6 +10,6 @@ import { SearchQueueService } from './search-queue.service';
 @Module({
   imports: [BullModule.registerQueue({ name: SEARCH_QUEUE }, { name: NOTIFY_QUEUE })],
   providers: [SearchEngineService, SearchCacheService, SearchQueueService, ProviderRegistry, AirportsService],
-  exports: [SearchEngineService, SearchQueueService, ProviderRegistry, AirportsService, BullModule],
+  exports: [SearchEngineService, SearchQueueService, SearchCacheService, ProviderRegistry, AirportsService, BullModule],
 })
 export class SearchModule {}

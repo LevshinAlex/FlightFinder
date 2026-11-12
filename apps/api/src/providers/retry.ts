@@ -1,14 +1,20 @@
-import { ProviderUnavailableError } from './flight-provider.interface';
+import { config } from '../common/config';
+import { ProviderTimeoutError, ProviderUnavailableError } from './flight-provider.interface';
 
-export async function withRetry<T>(fn: () => Promise<T>, attempts = 3, baseDelayMs = 1000): Promise<T> {
+/**
+ * Retries temporary failures (5xx, 429, network). Never a timeout (it would only double the wait), and never
+ * when the provider asks for a longer pause than one request may take (PROVIDER_TIMEOUT_SECONDS).
+ */
+export async function withRetry<T>(fn: () => Promise<T>, attempts = 3, baseDelayMs = 1000, maxDelayMs = config.providers.timeoutMs): Promise<T> {
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
       return await fn();
     } catch (e) {
       lastErr = e;
-      if (!(e instanceof ProviderUnavailableError) || i === attempts - 1) throw e;
+      if (!(e instanceof ProviderUnavailableError) || e instanceof ProviderTimeoutError || i === attempts - 1) throw e;
       const delay = e.retryAfterMs ?? baseDelayMs * 2 ** i;
+      if (delay > maxDelayMs) throw e;
       await new Promise((r) => setTimeout(r, delay));
     }
   }

@@ -16,7 +16,7 @@
  *   npm run probe -w apps/api -- --requests 4 --dep 2027-05-10 --ret 2027-05-20 --yes
  *
  * Options: --from TLV --to IT --dep/--ret YYYY-MM-DD --flex N (dep +N, ret −N) --stops 1 --adults 1
- *          --currency ILS --airports FCO,MXP --indicative a,b --live a,b --requests N --include-mock --yes
+ *          --currency USD --airports FCO,MXP --indicative a,b --live a,b --requests N --include-mock --yes
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -24,6 +24,8 @@ import { AirportsService } from '../src/airports/airports.service';
 import { addDays, toIsoDate } from '../src/common/dates';
 import { FlightProvider, ProviderOffer, SearchCriteria } from '../src/providers/flight-provider.interface';
 import { ProviderRegistry } from '../src/providers/provider.registry';
+import { withCurrencyNormalization } from '../src/providers/currency';
+import { config } from '../src/common/config';
 import { buildDateCombinations } from '../src/search/date-combinations';
 import { allCriteria } from '../src/search/search-planner';
 import {
@@ -49,7 +51,7 @@ function args() {
     flex: Number(get('flex') ?? 2),
     stops: Number(get('stops') ?? 1),
     adults: Number(get('adults') ?? 1),
-    currency: (get('currency') ?? 'ILS').toUpperCase(),
+    currency: (get('currency') ?? config.baseCurrency).toUpperCase(), // providers quoting another currency are converted
     airports: list('airports'),
     indicative: list('indicative'),
     live: list('live'),
@@ -92,7 +94,7 @@ async function main() {
       if (!p.capabilities[cap]) { if (names) skipped.push(`${p.name} (no ${cap})`); continue; }
       if (p.name === 'mock' && !o.includeMock && !names?.includes('mock')) continue;
       if (!(await p.getProviderStatus()).configured) { skipped.push(`${p.name} (no key)`); continue; }
-      out.push(p);
+      out.push(withCurrencyNormalization(p));
     }
     return out;
   };
@@ -190,4 +192,5 @@ async function main() {
   console.log(`Report: ${base}.md\n        ${base}.json`);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+// exit explicitly: the quota counters' Redis connection would keep the process alive after the report
+main().then(() => process.exit(0), (e) => { console.error(e); process.exit(1); });

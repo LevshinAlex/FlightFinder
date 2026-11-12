@@ -116,12 +116,16 @@ model FlightTracker {
   maxStops              Int           @default(1)
   adults                Int           @default(1)
   cabinClass            CabinClass    @default(ECONOMY)
-  currency              String        @default("ILS")
+  /// Always the base currency (USD); older trackers are converted on API start (CurrencyMigration)
+  currency              String        @default("USD")
   targetPrice           Decimal?      @db.Decimal(12, 2)
   /// Changes below this percentage are "no significant change"
   significantChangePct  Float         @default(2)
   status                TrackerStatus @default(ACTIVE)
   lastSearchAt          DateTime?
+  /// Last change of a price-affecting criterion (currency, passengers, dates, airports, …).
+  /// Prices of runs started before it are not comparable: trend, minima and chart start here.
+  criteriaUpdatedAt     DateTime      @default(now())
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
 
@@ -173,9 +177,16 @@ model FlightOffer {
   outboundDurationMin Int?
   inboundDurationMin  Int?
   segments            Json?
-  /// Total round-trip price for all passengers incl. known mandatory taxes
+  /// Total round-trip price for all passengers incl. known mandatory taxes – in the base currency (USD)
   price               Decimal     @db.Decimal(12, 2)
   currency            String
+  /// The provider's own quote when it was in another currency (price = converted at the daily rate)
+  originalPrice       Decimal?    @db.Decimal(12, 2)
+  originalCurrency    String?
+  /// Google Flights' rating of the search's prices: low | typical | high, and its usual range
+  priceLevel          String?
+  typicalPriceLow     Decimal?    @db.Decimal(12, 2)
+  typicalPriceHigh    Decimal?    @db.Decimal(12, 2)
   baggageIncluded     Boolean?
   baggagePrice        Decimal?    @db.Decimal(12, 2)
   fareId              String?
