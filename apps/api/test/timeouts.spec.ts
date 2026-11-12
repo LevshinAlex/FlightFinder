@@ -127,3 +127,13 @@ describe('REDIS_URL → queue connection', () => {
     expect(redisConnection('redis://localhost:6379')).not.toHaveProperty('tls');
   });
 });
+
+describe('provider lists from env', () => {
+  it('"none" / "off" switch a stage off; unset falls back to the default', () => {
+    const { providerList } = jest.requireActual('../src/common/config');
+    expect(providerList('none', 'mock')).toBe('');
+    expect(providerList(' OFF ', 'mock')).toBe('');
+    expect(providerList(undefined, 'mock')).toBe('mock');
+    expect(providerList('skyscanner_scraper,kiwi', 'mock')).toBe('skyscanner_scraper,kiwi');
+  });
+});

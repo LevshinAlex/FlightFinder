@@ -33,18 +33,22 @@ services:
         sync: false
       - key: WEB_URL             # e.g. https://llb-flights.vercel.app
         sync: false
+      # Real prices through RapidAPI (one key, RAPIDAPI_KEY, for all three; free BASIC plans: 1000 / 300 / 50 requests a month).
+      # No indicative stage: a mock one would mix invented prices into the real ones (see docs/DEPLOY.md, step 7).
       - key: INDICATIVE_PROVIDER
-        value: mock
+        value: none
       - key: LIVE_PROVIDER
-        value: mock
+        value: skyscanner_scraper,kiwi,flightpowers
       - key: CONTROL_PROVIDER
-        value: ""
+        value: none
       - key: LIVE_CHECK_TOP_N
         value: "3"
       - key: LIVE_AIRPORT_PROBES
         value: "false"
-      - key: RAPIDAPI_KEY          # optional: Kiwi.com Flights API (free BASIC plan) – then add kiwi to LIVE_PROVIDER
+      - key: RAPIDAPI_KEY          # required by LIVE_PROVIDER above – set it in Render → llb-api → Environment (never in git)
         sync: false
+      - key: PROVIDER_TIMEOUT_SECONDS   # a slower provider is skipped, the next one takes over
+        value: "30"
       - key: BASE_CURRENCY
         value: USD
       - key: EMAIL_TRANSPORT

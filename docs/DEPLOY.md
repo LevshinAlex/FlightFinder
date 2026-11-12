@@ -78,20 +78,16 @@ Render → `llb-api` → **Environment** → `WEB_URL` = ваш адрес из 
    - **iPhone (Safari):** «Поделиться» → «На экран „Домой“».
    - **Android (Chrome):** ⋮ → «Добавить на главный экран».
 
-## Шаг 7 (по желанию). Реальные цены
+## Шаг 7. Реальные цены
 
-Render → `llb-api` → **Environment**:
+`render.yaml` уже включает реальные источники через RapidAPI: `LIVE_PROVIDER=skyscanner_scraper,kiwi,flightpowers`.
+Им нужен один ключ: Render → `llb-api` → **Environment** → **Add Environment Variable** →
+`RAPIDAPI_KEY` = ваш ключ RapidAPI (тот же, что в `apps/api/.env`) → **Save Changes**.
+Без ключа поиск завершается ошибкой «Flight data provider unavailable».
 
-```
-INDICATIVE_PROVIDER=travelpayouts
-LIVE_PROVIDER=ignav
-CONTROL_PROVIDER=serpapi
-TRAVELPAYOUTS_TOKEN=…
-IGNAV_API_KEY=…
-SERPAPI_KEY=…
-```
-
-Пока `INDICATIVE_PROVIDER=mock`, цены демонстрационные.
+Источники с собственными ключами (`ignav`, `serpapi`, `hasdata`, `travelpayouts`) включаются так же:
+ключ в **Environment**, имя источника — в `LIVE_PROVIDER` / `INDICATIVE_PROVIDER` / `CONTROL_PROVIDER` в `render.yaml`
+(значения из `render.yaml` при каждом пуше перезаписывают те, что заданы в панели Render).
 **Не включайте mock-источник предварительных цен вместе с реальными:** выдуманные цены попадут в результаты рядом с настоящими.
 
 ## Ограничения бесплатного варианта

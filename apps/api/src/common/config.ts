@@ -5,6 +5,11 @@ import * as path from 'path';
 dotenv.config({ path: [path.resolve(process.cwd(), '.env'), path.resolve(__dirname, '../../../../.env')] });
 
 const num = (v: string | undefined, d: number) => (v && !isNaN(Number(v)) ? Number(v) : d);
+/** Provider list from env; "none" / "off" switch a stage off explicitly (an empty value may not survive a host's env UI). */
+export const providerList = (v: string | undefined, d: string) => {
+  const s = (v ?? d).trim();
+  return /^(none|off)$/i.test(s) ? '' : s;
+};
 
 export const config = {
   // API_PORT locally; PORT is what PaaS hosts (Render, Railway, …) assign
@@ -18,10 +23,10 @@ export const config = {
   /** Reference exchange rates: no key, no quota, no attribution (see fx.ts for accepted formats). */
   fxRatesUrl: process.env.FX_RATES_URL ?? 'https://api.frankfurter.dev/v2/rates?base=USD',
   providers: {
-    indicative: process.env.INDICATIVE_PROVIDER ?? 'mock',
-    live: process.env.LIVE_PROVIDER ?? 'mock',
+    indicative: providerList(process.env.INDICATIVE_PROVIDER, 'mock'),
+    live: providerList(process.env.LIVE_PROVIDER, 'mock'),
     /** Optional independent provider that re-checks the cheapest live result of each tracker. */
-    control: process.env.CONTROL_PROVIDER ?? '',
+    control: providerList(process.env.CONTROL_PROVIDER, ''),
     liveCheckTopN: num(process.env.LIVE_CHECK_TOP_N, 10),
     /** false → live-check only the top-N (no extra probe per destination airport) */
     liveAirportProbes: process.env.LIVE_AIRPORT_PROBES !== 'false',
