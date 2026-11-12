@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
 import { IconBell, IconClose, IconGear, IconGrid, IconLogout, IconMenu, IconPlane } from './icons';
@@ -39,6 +39,20 @@ export function setTrackerCount(n: number) { trackerCount = n; listeners.forEach
 let mePromise: Promise<Me> | null = null;
 const getMe = () => (mePromise ??= api<Me>('/auth/me').catch((e) => { mePromise = null; throw e; }));
 
+/** These module-level caches belong to the signed-in user: drop them on login, logout and account deletion
+ *  (client-side navigation keeps modules alive – the next user would see the previous one's name and count). */
+export function resetSessionCache() { mePromise = null; trackerCount = null; }
+
+/** Real API status for the top bar (it used to say "Service active" unconditionally). Cached for a minute across pages. */
+let health: { ok: boolean; at: number } | null = null;
+async function checkHealth(): Promise<boolean> {
+  if (health && Date.now() - health.at < 60_000) return health.ok;
+  let ok = false;
+  try { ok = !!(await api<{ ok: boolean }>('/health'))?.ok; } catch { ok = false; }
+  health = { ok, at: Date.now() };
+  return ok;
+}
+
 export function Brand() {
   const { t } = useI18n();
   return (
@@ -56,6 +70,10 @@ export default function AppShell({ children, crumb }: { children: ReactNode; cru
   const [me, setMe] = useState<Me | null>(null);
   const [count, setCount] = useState<number | null>(trackerCount);
   const [open, setOpen] = useState(false);
+  const [online, setOnline] = useState<boolean | null>(health?.ok ?? null);
+  const [logoutError, setLogoutError] = useState('');
+  const menuBtn = useRef<HTMLButtonElement>(null);
+  const closeBtn = useRef<HTMLButtonElement>(null);
 
   useEffect(() => { getMe().then(setMe).catch(() => {}); }, []);
   useEffect(() => {
@@ -63,11 +81,34 @@ export default function AppShell({ children, crumb }: { children: ReactNode; cru
     if (trackerCount == null) api<any[]>('/trackers').then((l) => setTrackerCount(l.length)).catch(() => {});
     return () => { listeners.delete(setCount); };
   }, []);
+  useEffect(() => {
+    let alive = true;
+    const run = () => checkHealth().then((ok) => { if (alive) setOnline(ok); });
+    run();
+    const h = setInterval(run, 60_000);
+    return () => { alive = false; clearInterval(h); };
+  }, []);
   useEffect(() => { setOpen(false); }, [path]);
 
+  // mobile drawer: focus moves into it on open and back to the menu button on close; Escape closes it
+  const openNav = () => { setOpen(true); requestAnimationFrame(() => closeBtn.current?.focus()); };
+  const closeNav = () => { setOpen(false); menuBtn.current?.focus(); };
+  useEffect(() => {
+    if (!open) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') closeNav(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [open]);
+
   const logout = async () => {
-    await api('/auth/logout', { method: 'POST' });
-    mePromise = null; trackerCount = null;
+    setLogoutError('');
+    try {
+      await api('/auth/logout', { method: 'POST' });
+    } catch {
+      setLogoutError(t.logoutFailed); // never pretend to be logged out while the session cookie is still valid
+      return;
+    }
+    resetSessionCache();
     router.push('/login');
   };
 
@@ -80,10 +121,11 @@ export default function AppShell({ children, crumb }: { children: ReactNode; cru
 
   return (
     <div className={`shell ${open ? 'nav-open' : ''}`}>
-      <aside className="sidebar">
+      <a href="#main" className="skip-link">{t.skipToContent}</a>
+      <aside className="sidebar" id="sidebar">
         <div className="sidebar-head">
           <Brand />
-          <button className="icon-btn only-mobile" onClick={() => setOpen(false)} aria-label={t.close}><IconClose /></button>
+          <button ref={closeBtn} className="icon-btn only-mobile" onClick={closeNav} aria-label={t.close}><IconClose /></button>
         </div>
         <div className="nav-label">{t.workspace}</div>
         <nav className="side-nav">
@@ -105,24 +147,31 @@ export default function AppShell({ children, crumb }: { children: ReactNode; cru
             <span className="user-text"><b>{me?.name || t.account}</b><small>{me?.email ?? ''}</small></span>
             <button className="icon-btn" onClick={logout} title={t.logout} aria-label={t.logout}><IconLogout size={18} /></button>
           </div>
+          {logoutError && <small className="bad" role="alert">{logoutError}</small>}
         </div>
       </aside>
-      <div className="scrim" onClick={() => setOpen(false)} />
+      {/* mouse convenience only – keyboard users close the drawer with Escape or the close button */}
+      <div className="scrim" aria-hidden="true" onClick={closeNav} />
 
       <div className="main-col">
         <header className="topbar">
-          <button className="icon-btn only-mobile" onClick={() => setOpen(true)} aria-label={t.menu}><IconMenu /></button>
+          <button ref={menuBtn} className="icon-btn only-mobile" onClick={openNav} aria-label={t.menu}
+            aria-expanded={open} aria-controls="sidebar"><IconMenu /></button>
           <div className="crumbs">
             <span>{t.workspace}</span><i>/</i><b>{crumb ?? t.dashboard}</b>
           </div>
           <div className="top-actions">
-            <span className="service-ok hide-sm"><i />{t.serviceActive}</span>
+            {online != null && (
+              <span className={`service-ok${online ? ' hide-sm' : ' down'}`} role="status">
+                <i />{online ? t.serviceActive : t.serviceDown}
+              </span>
+            )}
             <Link href="/notifications" className="icon-btn bordered" aria-label={t.notifications}><IconBell size={19} /></Link>
             <LangSwitch />
-            <Link href="/settings" className="avatar sm" title={me?.email}>{initials(me)}</Link>
+            <Link href="/settings" className="avatar sm" title={me?.email} aria-label={t.settings}>{initials(me)}</Link>
           </div>
         </header>
-        <main className="page">{children}</main>
+        <main className="page" id="main" tabIndex={-1}>{children}</main>
         <footer className="page-foot">{t.disclaimer}</footer>
       </div>
     </div>

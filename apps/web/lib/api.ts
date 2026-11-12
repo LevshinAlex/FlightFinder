@@ -51,4 +51,6 @@ export function dateRange(a: string, b: string, locale = 'ru') {
 export type Country = { code: string; flag: string; name: { en: string; ru: string }; airports: { iata: string; name: string; city: { en: string; ru: string } }[] };
 
 let countriesCache: Promise<Country[]> | null = null;
-export const getCountries = () => (countriesCache ??= api<Country[]>('/airports/countries'));
+// a failed request is not cached – otherwise every form stays broken until a full reload
+export const getCountries = () =>
+  (countriesCache ??= api<Country[]>('/airports/countries').catch((e) => { countriesCache = null; throw e; }));

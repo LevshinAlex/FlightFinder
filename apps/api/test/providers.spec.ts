@@ -7,6 +7,8 @@ import { HasDataProvider } from '../src/providers/hasdata.provider';
 import { IgnavProvider } from '../src/providers/ignav.provider';
 import { ProviderNotSupportedError, ProviderRequestError, SearchCriteria } from '../src/providers/flight-provider.interface';
 import { filterOffers } from '../src/search/search-planner';
+import { FxRates } from '../src/common/fx';
+import { withCurrencyNormalization } from '../src/providers/currency';
 
 const criteria: SearchCriteria = {
   origin: 'TLV', destination: 'FCO', departureDate: '2027-05-10', returnDate: '2027-05-20',
@@ -135,7 +137,7 @@ describe('Ignav', () => {
     }],
   });
 
-  it('posts round-trip body with market from currency; maps both legs', async () => {
+  it('posts round-trip body with the configured market (IL); maps both legs', async () => {
     respond(body('ILS'));
     const offers = await new IgnavProvider().searchFlights(criteria);
     expect(calls[0].url).toBe('https://ignav.com/api/fares/round-trip');
@@ -156,9 +158,13 @@ describe('Ignav', () => {
     expect(o.priceStatus).toBe('INDICATIVE');
   });
 
-  it('refuses a different currency instead of converting', async () => {
-    respond(body('USD'));
-    await expect(new IgnavProvider().searchFlights(criteria)).rejects.toThrow(/expected ILS/);
+  it('asks the IL market even for USD; the currency layer converts ILS → USD and keeps the quote', async () => {
+    respond(body('ILS'));
+    const rates = new FxRates(() => 'unused');
+    rates.setRates('USD', { ILS: 4 });
+    const [o] = await withCurrencyNormalization(new IgnavProvider(), rates).searchFlights({ ...criteria, currency: 'USD' });
+    expect(JSON.parse(String(calls[0].init?.body)).market).toBe('IL');
+    expect(o).toMatchObject({ price: 362.5, currency: 'USD', originalPrice: 1450, originalCurrency: 'ILS' });
   });
 
   it('booking link prefers exact_flight', async () => {

@@ -18,7 +18,12 @@ export interface CheapestPoint {
   returnDate: string;
   price: number;
   priceStatus: 'LIVE' | 'INDICATIVE';
+  /** Google Flights' rating of this price and its usual range (only Google-based providers) */
+  priceLevel?: PriceLevel | null;
+  typicalRange?: [number, number] | null;
 }
+
+export type PriceLevel = 'low' | 'typical' | 'high';
 
 export interface HistoryPoint {
   price: number;
@@ -59,6 +64,10 @@ export interface PriceAnalysis {
   historicalMin: number | null;
   isNewHistoricalLow: boolean;
   targetReached: boolean;
+  /** Google's rating of today's / the previous cheapest price, and today's usual range */
+  priceLevel: PriceLevel | null;
+  previousPriceLevel: PriceLevel | null;
+  typicalRange: [number, number] | null;
 }
 
 export function round2(n: number): number {
@@ -104,6 +113,9 @@ export function analyzePrices(input: AnalysisInput): PriceAnalysis {
     historicalMin: minSince(history, null, cur),
     isNewHistoricalLow: false,
     targetReached: false,
+    priceLevel: current?.priceLevel ?? null,
+    previousPriceLevel: previousCheapest?.priceLevel ?? null,
+    typicalRange: current?.typicalRange ?? null,
   };
 
   // Test #8: on API failure or empty result we never report an increase / decrease.
@@ -128,4 +140,19 @@ export function analyzePrices(input: AnalysisInput): PriceAnalysis {
     base.sameRoute = { previousPrice: p, change: round2(cur - p), changePct: pct, status: classifyChange(pct, input.significantChangePct) };
   }
   return base;
+}
+
+/**
+ * Extra alert (spec 8.3), edge-triggered: a significant drop since the previous check, the price
+ * crossing below the target, or Google starting to rate it "low". Staying there is shown in the
+ * daily summary – it does not trigger a new alert every morning.
+ * Only a LIVE price can alert: a cached / approximate one may no longer exist.
+ */
+export function shouldSendPriceAlert(a: PriceAnalysis, dropAlertPct: number, targetPrice: number | null): boolean {
+  if (a.outcome !== 'SUCCESS' && a.outcome !== 'PARTIAL') return false;
+  if (a.currentPriceStatus !== 'LIVE') return false;
+  const bigDrop = a.priceChangePct != null && a.priceChangePct <= -dropAlertPct;
+  const crossedTarget = a.targetReached && (a.previousPrice == null || targetPrice == null || a.previousPrice > targetPrice);
+  const turnedLow = a.priceLevel === 'low' && a.previousPriceLevel !== 'low';
+  return bigDrop || crossedTarget || turnedLow;
 }

@@ -1,6 +1,7 @@
 import { config } from '../common/config';
+import { isQuotaMessage, providerBudget } from './budget';
 import {
-  FlightProvider, ProviderCapabilities, ProviderNotSupportedError, ProviderOffer, ProviderRequestError,
+  FlightProvider, ProviderCapabilities, ProviderNotSupportedError, ProviderOffer, ProviderQuotaExceededError, ProviderRequestError,
   ProviderStatus, SearchCriteria,
 } from './flight-provider.interface';
 import { outboundOnlyOffers, resolveGoogleRoundTrip } from './google-flights';
@@ -19,6 +20,7 @@ const NO_RESULTS = /hasn't returned any results/i;
 export class SerpApiProvider implements FlightProvider {
   readonly name = 'serpapi';
   readonly capabilities: ProviderCapabilities = { indicativePrices: false, liveSearch: true, flightDetails: false, bookingLink: true };
+  readonly requestsPerLiveCheck = 2; // outbound page + return page
   private base = 'https://serpapi.com/search.json';
 
   private get key() {
@@ -36,9 +38,13 @@ export class SerpApiProvider implements FlightProvider {
     });
     if (departureToken) qs.set('departure_token', departureToken);
     try {
-      const json = await providerFetch(this.name, `${this.base}?${qs}`, {}, 60000);
+      const json = await providerFetch(this.name, `${this.base}?${qs}`);
       if (json?.error) {
         if (NO_RESULTS.test(json.error)) return {};
+        if (isQuotaMessage(json.error)) {
+          await providerBudget.block(this.name, json.error);
+          throw new ProviderQuotaExceededError(this.name, json.error);
+        }
         throw new ProviderRequestError(this.name, json.error);
       }
       return json;

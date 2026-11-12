@@ -11,12 +11,12 @@ import { providerFetch } from './http';
  * Docs: https://ignav.com/docs/round-trip , https://ignav.com/docs/booking-links
  * Free: 1000 requests, only successful requests billed.
  *
- * There is no currency parameter: the pricing currency follows `market`. We map the tracker currency
- * to a market and refuse (instead of converting) if the provider answers in another currency.
+ * There is no currency parameter: prices come in the currency of the point-of-sale `market`
+ * (IGNAV_MARKET, default IL – what travellers from Israel actually pay). The provider layer
+ * converts them to the base currency (currency.ts) and keeps the original quote.
  * Ignav notes a search price is not a reserved fare nor a guarantee of a single combined ticket.
  */
 const CABIN: Record<string, string> = { ECONOMY: 'economy', PREMIUM_ECONOMY: 'premium_economy', BUSINESS: 'business', FIRST: 'first' };
-const MARKET: Record<string, string> = { ILS: 'IL', USD: 'US', GBP: 'GB', EUR: 'DE' };
 const DAY = 86_400_000;
 const ms = (d: string) => Date.parse(`${d}T00:00:00Z`);
 
@@ -62,10 +62,8 @@ export class IgnavProvider implements FlightProvider {
     }));
   }
 
-  private market(currency: string, method: string): string {
-    const market = MARKET[currency.toUpperCase()];
-    if (!market) throw new ProviderNotSupportedError(this.name, `${method} in ${currency}`);
-    return market;
+  private get market(): string {
+    return config.providers.ignavMarket;
   }
 
   /**
@@ -75,8 +73,7 @@ export class IgnavProvider implements FlightProvider {
    * Docs: https://ignav.com/docs/cheapest-dates
    */
   async getIndicativePrices(c: IndicativeCriteria): Promise<ProviderOffer[]> {
-    const currency = c.currency.toUpperCase();
-    const market = this.market(currency, 'getIndicativePrices');
+    const market = this.market;
     const out: ProviderOffer[] = [];
     for (const destination of c.destinations) {
       for (const [stay, combos] of groupByStay(c.combinations)) {
@@ -95,14 +92,12 @@ export class IgnavProvider implements FlightProvider {
             const dep = e.departure_date ?? e.date;
             const ret = e.return_date;
             if (!e.price || e.price.amount == null || !wanted.has(`${dep}|${ret}`)) continue;
-            if (String(e.price.currency).toUpperCase() !== currency) {
-              throw new ProviderRequestError(this.name, `market ${market} priced in ${e.price.currency}, expected ${currency}`);
-            }
             out.push({
               provider: this.name, origin: c.origin, destination, departureDate: dep, returnDate: ret,
               // unknown – the request's max_stops filter is what guarantees the limit; never shown
               outboundStops: 0, inboundStops: 0,
-              price: Number(e.price.amount), currency, priceStatus: 'INDICATIVE', rankingOnly: true, observedAt,
+              price: Number(e.price.amount), currency: String(e.price.currency ?? '').toUpperCase(),
+              priceStatus: 'INDICATIVE', rankingOnly: true, observedAt,
             });
           }
         }
@@ -112,8 +107,7 @@ export class IgnavProvider implements FlightProvider {
   }
 
   async searchFlights(c: SearchCriteria): Promise<ProviderOffer[]> {
-    const currency = c.currency.toUpperCase();
-    const market = this.market(currency, 'searchFlights');
+    const market = this.market;
     const body = {
       origin: c.origin, destination: c.destination,
       departure_date: c.departureDate, return_date: c.returnDate,
@@ -124,10 +118,6 @@ export class IgnavProvider implements FlightProvider {
     }, 60000);
 
     const its: any[] = json?.itineraries ?? [];
-    const wrongCurrency = its.find((i) => i.price?.currency && String(i.price.currency).toUpperCase() !== currency);
-    if (wrongCurrency) {
-      throw new ProviderRequestError(this.name, `market ${market} priced in ${wrongCurrency.price.currency}, expected ${currency}`);
-    }
     const observedAt = json?.observed_at ?? new Date().toISOString();
     return its
       .filter((i) => i.price?.amount != null)
@@ -148,7 +138,7 @@ export class IgnavProvider implements FlightProvider {
           inboundDurationMin: i.inbound?.duration_minutes,
           segments: { outbound: outSegs, inbound: inSegs },
           price: Number(i.price.amount),
-          currency,
+          currency: String(i.price.currency ?? '').toUpperCase(), // market currency – converted by currency.ts
           // only "verified" prices are confirmed by Ignav; anything else is approximate
           priceStatus: i.price.status === 'verified' ? 'LIVE' : 'INDICATIVE',
           observedAt,

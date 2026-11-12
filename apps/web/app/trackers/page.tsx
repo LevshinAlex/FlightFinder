@@ -10,7 +10,7 @@ export default function Trackers() {
   return (
     <AppShell crumb={t.dashboard}>
       <PageHeader title={t.dashboard} count={items?.length} sub={t.pageSub} action={<NewTrackerButton />} />
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
       {items ? <TrackerTable items={items} reload={load} /> : !error && <div className="card skeleton" />}
     </AppShell>
   );

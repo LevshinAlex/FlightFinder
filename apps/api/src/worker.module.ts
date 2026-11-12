@@ -1,7 +1,8 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
-import { JwtGlobal, redisConnection } from './app.module';
+import { JwtGlobal } from './app.module';
+import { redisConnection } from './common/redis';
 import { NotificationModule } from './notifications/notification.module';
 import { NotificationProcessor } from './notifications/notification.processor';
 import { PrismaModule } from './prisma/prisma.service';

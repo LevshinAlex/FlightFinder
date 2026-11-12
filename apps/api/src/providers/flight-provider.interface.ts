@@ -52,6 +52,11 @@ export interface ProviderOffer {
   /** Total round-trip price for ALL passengers incl. known mandatory taxes */
   price: number;
   currency: string;
+  /** Set when the provider quoted another currency and `price` was converted (see currency.ts) */
+  originalPrice?: number;
+  originalCurrency?: string;
+  /** Google Flights' own judgement of this search's prices (same currency as `price`) */
+  priceInsight?: PriceInsight;
   baggageIncluded?: boolean;
   baggagePrice?: number;
   fareId?: string;
@@ -66,6 +71,14 @@ export interface ProviderOffer {
   rankingOnly?: boolean;
   expiresAt?: string;
   observedAt: string;        // ISO timestamp from provider (cache age) or now
+}
+
+export interface PriceInsight {
+  level?: 'low' | 'typical' | 'high';
+  typicalLow?: number;
+  typicalHigh?: number;
+  /** [epoch ms, price] – Google's recent price history for this route & dates */
+  history?: [number, number][];
 }
 
 export interface ProviderCapabilities {
@@ -85,6 +98,8 @@ export interface ProviderStatus {
 export interface FlightProvider {
   readonly name: string;
   readonly capabilities: ProviderCapabilities;
+  /** HTTP requests one searchFlights() call costs (Google Flights scrapers: 2). Default 1. Used for quota planning. */
+  readonly requestsPerLiveCheck?: number;
   searchFlights(criteria: SearchCriteria): Promise<ProviderOffer[]>;
   getIndicativePrices(criteria: IndicativeCriteria): Promise<ProviderOffer[]>;
   getFlightDetails(offerId: string): Promise<ProviderOffer>;
@@ -107,10 +122,29 @@ export class ProviderUnavailableError extends Error {
   }
 }
 
+/**
+ * No answer within PROVIDER_TIMEOUT_SECONDS. Not retried – a retry would only double the wait;
+ * the next provider of the chain takes over.
+ */
+export class ProviderTimeoutError extends ProviderUnavailableError {
+  constructor(provider: string, readonly timeoutMs: number) {
+    super(provider, `no answer within ${Math.round(timeoutMs / 1000)} s`);
+    this.name = 'ProviderTimeoutError';
+  }
+}
+
 /** Non-retryable failure (bad credentials, invalid request). */
 export class ProviderRequestError extends Error {
   constructor(provider: string, message: string) {
     super(`${provider}: ${message}`);
     this.name = 'ProviderRequestError';
+  }
+}
+
+/** The provider's free quota (or today's share of it) is used up – not retried, the next provider takes over. */
+export class ProviderQuotaExceededError extends ProviderRequestError {
+  constructor(provider: string, message: string) {
+    super(provider, `quota exceeded – ${message}`);
+    this.name = 'ProviderQuotaExceededError';
   }
 }

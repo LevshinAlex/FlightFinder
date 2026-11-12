@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import AppShell, { PageHeader } from '@/components/AppShell';
+import { useEffect, useRef, useState } from 'react';
+import AppShell, { PageHeader, resetSessionCache } from '@/components/AppShell';
 import { api, fmtDateTime } from '@/lib/api';
 import { Locale, useI18n } from '@/lib/i18n';
 
@@ -23,24 +23,36 @@ export default function Settings() {
     api('/notifications/logs').then(setLogs).catch(() => {});
   }, []);
 
-  const flash = (m: string) => { setMsg(m); setError(''); setTimeout(() => setMsg(''), 2500); };
+  // one timer: a new message is not cut short by the timeout of the previous one
+  const flashTimer = useRef<ReturnType<typeof setTimeout>>();
+  const flash = (m: string) => {
+    setMsg(m); setError('');
+    clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setMsg(''), 2500);
+  };
+  useEffect(() => () => clearTimeout(flashTimer.current), []);
   const fail = (e: any) => { setError(e.message); setMsg(''); };
+  const [saving, setSaving] = useState<'prefs' | 'profile' | null>(null);
 
   const saveProfile = async () => {
+    setSaving('profile');
     try {
       const p = await api('/user/profile', { method: 'PUT', json: { name: profile.name ?? '', phone: profile.phone ?? '', whatsappConsent: consent, locale } });
       setProfile(p); setConsent(!!p.whatsappConsentAt);
       setPrefs(await api('/notifications/settings'));
       flash(t.saved);
     } catch (e) { fail(e); }
+    finally { setSaving(null); }
   };
 
   const savePrefs = async () => {
+    setSaving('prefs');
     try {
       const { userId, ...body } = prefs;
       setPrefs(await api('/notifications/settings', { method: 'PUT', json: body }));
       flash(t.saved);
     } catch (e) { fail(e); }
+    finally { setSaving(null); }
   };
 
   const test = async () => {
@@ -50,8 +62,11 @@ export default function Settings() {
 
   const deleteAccount = async () => {
     if (!confirm(t.confirmDeleteAccount)) return;
-    await api('/user/account', { method: 'DELETE' });
-    router.push('/register');
+    try {
+      await api('/user/account', { method: 'DELETE' });
+      resetSessionCache();
+      router.push('/register');
+    } catch (e) { fail(e); }
   };
 
   const changeLocale = async (l: Locale) => {
@@ -64,8 +79,8 @@ export default function Settings() {
   return (
     <AppShell crumb={t.settings}>
       <PageHeader title={t.settings} />
-      {msg && <div className="notice">{msg}</div>}
-      {error && <div className="error">{error}</div>}
+      {msg && <div className="notice" role="status">{msg}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
 
       <h2>{t.notifications}</h2>
       {prefs && (
@@ -87,7 +102,7 @@ export default function Settings() {
             </label>
           </div>
           <div className="row" style={{ marginTop: 16 }}>
-            <button className="btn primary" onClick={savePrefs}>{t.saveChanges}</button>
+            <button className="btn primary" onClick={savePrefs} disabled={saving === 'prefs'}>{saving === 'prefs' ? t.saving : t.saveChanges}</button>
             <button className="btn" onClick={test}>{t.sendTest}</button>
           </div>
         </div>
@@ -98,8 +113,8 @@ export default function Settings() {
         <div className="card">
           <div className="form-grid">
             <label className="field">{t.email}<input value={profile.email} disabled /></label>
-            <label className="field">{t.name}<input value={profile.name ?? ''} onChange={(e) => setProfile({ ...profile, name: e.target.value })} /></label>
-            <label className="field">{t.phone}<input type="tel" placeholder="+972501234567" value={profile.phone ?? ''} onChange={(e) => setProfile({ ...profile, phone: e.target.value.trim() })} /></label>
+            <label className="field">{t.name}<input name="name" autoComplete="name" value={profile.name ?? ''} onChange={(e) => setProfile({ ...profile, name: e.target.value })} /></label>
+            <label className="field">{t.phone}<input type="tel" name="phone" autoComplete="tel" placeholder="+972501234567" value={profile.phone ?? ''} onChange={(e) => setProfile({ ...profile, phone: e.target.value.trim() })} /></label>
             <label className="field">{t.language}
               <select value={locale} onChange={(e) => changeLocale(e.target.value as Locale)}>
                 <option value="ru">Русский</option><option value="en">English</option>
@@ -110,7 +125,7 @@ export default function Settings() {
             <input type="checkbox" checked={consent} disabled={!profile.phone} onChange={(e) => setConsent(e.target.checked)} /> {t.waConsent}
           </label>
           <div className="row" style={{ marginTop: 16 }}>
-            <button className="btn primary" onClick={saveProfile}>{t.saveChanges}</button>
+            <button className="btn primary" onClick={saveProfile} disabled={saving === 'profile'}>{saving === 'profile' ? t.saving : t.saveChanges}</button>
             <span className="spacer" />
             <button className="btn danger" onClick={deleteAccount}>{t.deleteAccount}</button>
           </div>
@@ -121,13 +136,16 @@ export default function Settings() {
         <>
           <h2>{t.recentNotifications}</h2>
           <div className="card table-wrap" style={{ padding: 8 }}>
+            {/* same wording as the Notifications page – never raw codes like EMAIL / DAILY_SUMMARY / SENT */}
             <table>
+              <thead><tr><th>{t.when}</th><th>{t.kind}</th><th>{t.channel}</th><th>{t.status}</th></tr></thead>
               <tbody>
                 {logs.map((l) => (
                   <tr key={l.id}>
-                    <td className="small">{fmtDateTime(l.sentAt, locale)}</td><td className="small">{l.channel}</td>
-                    <td className="small muted">{l.kind}</td>
-                    <td><span className={`chip ${l.status === 'SENT' ? 'ok' : l.status === 'FAILED' ? 'bad' : ''}`}>{l.status}</span></td>
+                    <td className="small nowrap">{fmtDateTime(l.sentAt, locale)}</td>
+                    <td className="small">{(t as any)[`KIND_${l.kind}`] ?? l.kind}</td>
+                    <td className="small">{l.channel === 'EMAIL' ? t.emailCh : t.whatsappCh}</td>
+                    <td><span className={`chip ${l.status === 'SENT' ? 'ok' : l.status === 'FAILED' ? 'bad' : ''}`}>{(t as any)[`NS_${l.status}`] ?? l.status}</span></td>
                   </tr>
                 ))}
               </tbody>

@@ -17,6 +17,48 @@
   ]
  },
  {
+  "code": "AR",
+  "name": {
+   "en": "Argentina",
+   "ru": "Аргентина"
+  },
+  "airports": [
+   {
+    "iata": "EZE",
+    "city": {
+     "en": "Buenos Aires",
+     "ru": "Буэнос-Айрес"
+    },
+    "name": "Ezeiza"
+   },
+   {
+    "iata": "AEP",
+    "city": {
+     "en": "Buenos Aires",
+     "ru": "Буэнос-Айрес"
+    },
+    "name": "Aeroparque Jorge Newbery"
+   }
+  ]
+ },
+ {
+  "code": "AM",
+  "name": {
+   "en": "Armenia",
+   "ru": "Армения"
+  },
+  "airports": [
+   {
+    "iata": "EVN",
+    "city": {
+     "en": "Yerevan",
+     "ru": "Ереван"
+    },
+    "name": "Zvartnots"
+   }
+  ]
+ },
+ {
   "code": "AT",
   "name": {
    "en": "Austria",
@@ -50,6 +92,57 @@
   ]
  },
  {
+  "code": "AZ",
+  "name": {
+   "en": "Azerbaijan",
+   "ru": "Азербайджан"
+  },
+  "airports": [
+   {
+    "iata": "GYD",
+    "city": {
+     "en": "Baku",
+     "ru": "Баку"
+    },
+    "name": "Heydar Aliyev"
+   }
+  ]
+ },
+ {
+  "code": "BS",
+  "name": {
+   "en": "Bahamas",
+   "ru": "Багамы"
+  },
+  "airports": [
+   {
+    "iata": "NAS",
+    "city": {
+     "en": "Nassau",
+     "ru": "Нассау"
+    },
+    "name": "Lynden Pindling"
+   }
+  ]
+ },
+ {
+  "code": "BY",
+  "name": {
+   "en": "Belarus",
+   "ru": "Беларусь"
+  },
+  "airports": [
+   {
+    "iata": "MSQ",
+    "city": {
+     "en": "Minsk",
+     "ru": "Минск"
+    },
+    "name": "Minsk National"
+   }
+  ]
+ },
+ {
   "code": "BE",
   "name": {
    "en": "Belgium",
@@ -71,6 +164,106 @@
      "ru": "Шарлеруа"
     },
     "name": "Brussels South"
+   }
+  ]
+ },
+ {
+  "code": "BZ",
+  "name": {
+   "en": "Belize",
+   "ru": "Белиз"
+  },
+  "airports": [
+   {
+    "iata": "BZE",
+    "city": {
+     "en": "Belize City",
+     "ru": "Белиз-Сити"
+    },
+    "name": "Philip S. W. Goldson"
+   }
+  ]
+ },
+ {
+  "code": "BO",
+  "name": {
+   "en": "Bolivia",
+   "ru": "Боливия"
+  },
+  "airports": [
+   {
+    "iata": "VVI",
+    "city": {
+     "en": "Santa Cruz",
+     "ru": "Санта-Крус"
+    },
+    "name": "Viru Viru"
+   },
+   {
+    "iata": "LPB",
+    "city": {
+     "en": "La Paz",
+     "ru": "Ла-Пас"
+    },
+    "name": "El Alto"
+   }
+  ]
+ },
+ {
+  "code": "BA",
+  "name": {
+   "en": "Bosnia and Herzegovina",
+   "ru": "Босния и Герцеговина"
+  },
+  "airports": [
+   {
+    "iata": "SJJ",
+    "city": {
+     "en": "Sarajevo",
+     "ru": "Сараево"
+    },
+    "name": "Sarajevo International"
+   }
+  ]
+ },
+ {
+  "code": "BR",
+  "name": {
+   "en": "Brazil",
+   "ru": "Бразилия"
+  },
+  "airports": [
+   {
+    "iata": "GRU",
+    "city": {
+     "en": "Sao Paulo",
+     "ru": "Сан-Паулу"
+    },
+    "name": "Guarulhos"
+   },
+   {
+    "iata": "GIG",
+    "city": {
+     "en": "Rio de Janeiro",
+     "ru": "Рио-де-Жанейро"
+    },
+    "name": "Galeao"
+   },
+   {
+    "iata": "BSB",
+    "city": {
+     "en": "Brasilia",
+     "ru": "Бразилиа"
+    },
+    "name": "Brasilia International"
+   },
+   {
+    "iata": "SSA",
+    "city": {
+     "en": "Salvador",
+     "ru": "Салвадор"
+    },
+    "name": "Salvador International"
    }
   ]
  },
@@ -108,6 +301,147 @@
   ]
  },
  {
+  "code": "KH",
+  "name": {
+   "en": "Cambodia",
+   "ru": "Камбоджа"
+  },
+  "airports": [
+   {
+    "iata": "KTI",
+    "city": {
+     "en": "Phnom Penh",
+     "ru": "Пномпень"
+    },
+    "name": "Techo International"
+   },
+   {
+    "iata": "SAI",
+    "city": {
+     "en": "Siem Reap",
+     "ru": "Сиемреап"
+    },
+    "name": "Siem Reap-Angkor"
+   }
+  ]
+ },
+ {
+  "code": "CA",
+  "name": {
+   "en": "Canada",
+   "ru": "Канада"
+  },
+  "airports": [
+   {
+    "iata": "YYZ",
+    "city": {
+     "en": "Toronto",
+     "ru": "Торонто"
+    },
+    "name": "Pearson"
+   },
+   {
+    "iata": "YUL",
+    "city": {
+     "en": "Montreal",
+     "ru": "Монреаль"
+    },
+    "name": "Trudeau"
+   },
+   {
+    "iata": "YVR",
+    "city": {
+     "en": "Vancouver",
+     "ru": "Ванкувер"
+    },
+    "name": "Vancouver International"
+   },
+   {
+    "iata": "YYC",
+    "city": {
+     "en": "Calgary",
+     "ru": "Калгари"
+    },
+    "name": "Calgary International"
+   }
+  ]
+ },
+ {
+  "code": "CL",
+  "name": {
+   "en": "Chile",
+   "ru": "Чили"
+  },
+  "airports": [
+   {
+    "iata": "SCL",
+    "city": {
+     "en": "Santiago",
+     "ru": "Сантьяго"
+    },
+    "name": "Arturo Merino Benitez"
+   }
+  ]
+ },
+ {
+  "code": "CO",
+  "name": {
+   "en": "Colombia",
+   "ru": "Колумбия"
+  },
+  "airports": [
+   {
+    "iata": "BOG",
+    "city": {
+     "en": "Bogota",
+     "ru": "Богота"
+    },
+    "name": "El Dorado"
+   },
+   {
+    "iata": "MDE",
+    "city": {
+     "en": "Medellin",
+     "ru": "Медельин"
+    },
+    "name": "Jose Maria Cordova"
+   },
+   {
+    "iata": "CTG",
+    "city": {
+     "en": "Cartagena",
+     "ru": "Картахена"
+    },
+    "name": "Rafael Nunez"
+   }
+  ]
+ },
+ {
+  "code": "CR",
+  "name": {
+   "en": "Costa Rica",
+   "ru": "Коста-Рика"
+  },
+  "airports": [
+   {
+    "iata": "SJO",
+    "city": {
+     "en": "San Jose",
+     "ru": "Сан-Хосе"
+    },
+    "name": "Juan Santamaria"
+   },
+   {
+    "iata": "LIR",
+    "city": {
+     "en": "Liberia",
+     "ru": "Либерия"
+    },
+    "name": "Guanacaste"
+   }
+  ]
+ },
+ {
   "code": "HR",
   "name": {
    "en": "Croatia",
@@ -137,6 +471,31 @@
      "ru": "Дубровник"
     },
     "name": "Dubrovnik"
+   }
+  ]
+ },
+ {
+  "code": "CU",
+  "name": {
+   "en": "Cuba",
+   "ru": "Куба"
+  },
+  "airports": [
+   {
+    "iata": "HAV",
+    "city": {
+     "en": "Havana",
+     "ru": "Гавана"
+    },
+    "name": "Jose Marti"
+   },
+   {
+    "iata": "VRA",
+    "city": {
+     "en": "Varadero",
+     "ru": "Варадеро"
+    },
+    "name": "Juan Gualberto Gomez"
    }
   ]
  },
@@ -208,6 +567,56 @@
   ]
  },
  {
+  "code": "DO",
+  "name": {
+   "en": "Dominican Republic",
+   "ru": "Доминиканская Республика"
+  },
+  "airports": [
+   {
+    "iata": "PUJ",
+    "city": {
+     "en": "Punta Cana",
+     "ru": "Пунта-Кана"
+    },
+    "name": "Punta Cana International"
+   },
+   {
+    "iata": "SDQ",
+    "city": {
+     "en": "Santo Domingo",
+     "ru": "Санто-Доминго"
+    },
+    "name": "Las Americas"
+   }
+  ]
+ },
+ {
+  "code": "EC",
+  "name": {
+   "en": "Ecuador",
+   "ru": "Эквадор"
+  },
+  "airports": [
+   {
+    "iata": "UIO",
+    "city": {
+     "en": "Quito",
+     "ru": "Кито"
+    },
+    "name": "Mariscal Sucre"
+   },
+   {
+    "iata": "GYE",
+    "city": {
+     "en": "Guayaquil",
+     "ru": "Гуаякиль"
+    },
+    "name": "Jose Joaquin de Olmedo"
+   }
+  ]
+ },
+ {
   "code": "EG",
   "name": {
    "en": "Egypt",
@@ -237,6 +646,65 @@
      "ru": "Хургада"
     },
     "name": "Hurghada"
+   }
+  ]
+ },
+ {
+  "code": "SV",
+  "name": {
+   "en": "El Salvador",
+   "ru": "Сальвадор"
+  },
+  "airports": [
+   {
+    "iata": "SAL",
+    "city": {
+     "en": "San Salvador",
+     "ru": "Сан-Сальвадор"
+    },
+    "name": "Monsenor Oscar Arnulfo Romero"
+   }
+  ]
+ },
+ {
+  "code": "EE",
+  "name": {
+   "en": "Estonia",
+   "ru": "Эстония"
+  },
+  "airports": [
+   {
+    "iata": "TLL",
+    "city": {
+     "en": "Tallinn",
+     "ru": "Таллин"
+    },
+    "name": "Lennart Meri"
+   }
+  ]
+ },
+ {
+  "code": "FI",
+  "name": {
+   "en": "Finland",
+   "ru": "Финляндия"
+  },
+  "airports": [
+   {
+    "iata": "HEL",
+    "city": {
+     "en": "Helsinki",
+     "ru": "Хельсинки"
+    },
+    "name": "Helsinki-Vantaa"
+   },
+   {
+    "iata": "RVN",
+    "city": {
+     "en": "Rovaniemi",
+     "ru": "Рованиеми"
+    },
+    "name": "Rovaniemi"
    }
   ]
  },
@@ -501,6 +969,40 @@
   ]
  },
  {
+  "code": "GT",
+  "name": {
+   "en": "Guatemala",
+   "ru": "Гватемала"
+  },
+  "airports": [
+   {
+    "iata": "GUA",
+    "city": {
+     "en": "Guatemala City",
+     "ru": "Гватемала"
+    },
+    "name": "La Aurora"
+   }
+  ]
+ },
+ {
+  "code": "HN",
+  "name": {
+   "en": "Honduras",
+   "ru": "Гондурас"
+  },
+  "airports": [
+   {
+    "iata": "SAP",
+    "city": {
+     "en": "San Pedro Sula",
+     "ru": "Сан-Педро-Сула"
+    },
+    "name": "Ramon Villeda Morales"
+   }
+  ]
+ },
+ {
   "code": "HU",
   "name": {
    "en": "Hungary",
@@ -522,6 +1024,23 @@
      "ru": "Дебрецен"
     },
     "name": "Debrecen"
+   }
+  ]
+ },
+ {
+  "code": "IS",
+  "name": {
+   "en": "Iceland",
+   "ru": "Исландия"
+  },
+  "airports": [
+   {
+    "iata": "KEF",
+    "city": {
+     "en": "Reykjavik",
+     "ru": "Рейкьявик"
+    },
+    "name": "Keflavik"
    }
   ]
  },
@@ -563,6 +1082,31 @@
      "ru": "Гоа"
     },
     "name": "Manohar"
+   }
+  ]
+ },
+ {
+  "code": "ID",
+  "name": {
+   "en": "Indonesia",
+   "ru": "Индонезия"
+  },
+  "airports": [
+   {
+    "iata": "DPS",
+    "city": {
+     "en": "Bali",
+     "ru": "Бали"
+    },
+    "name": "Ngurah Rai"
+   },
+   {
+    "iata": "CGK",
+    "city": {
+     "en": "Jakarta",
+     "ru": "Джакарта"
+    },
+    "name": "Soekarno-Hatta"
    }
   ]
  },
@@ -770,6 +1314,31 @@
   ]
  },
  {
+  "code": "JM",
+  "name": {
+   "en": "Jamaica",
+   "ru": "Ямайка"
+  },
+  "airports": [
+   {
+    "iata": "MBJ",
+    "city": {
+     "en": "Montego Bay",
+     "ru": "Монтего-Бей"
+    },
+    "name": "Sangster"
+   },
+   {
+    "iata": "KIN",
+    "city": {
+     "en": "Kingston",
+     "ru": "Кингстон"
+    },
+    "name": "Norman Manley"
+   }
+  ]
+ },
+ {
   "code": "JP",
   "name": {
    "en": "Japan",
@@ -843,6 +1412,31 @@
   ]
  },
  {
+  "code": "LA",
+  "name": {
+   "en": "Laos",
+   "ru": "Лаос"
+  },
+  "airports": [
+   {
+    "iata": "VTE",
+    "city": {
+     "en": "Vientiane",
+     "ru": "Вьентьян"
+    },
+    "name": "Wattay"
+   },
+   {
+    "iata": "LPQ",
+    "city": {
+     "en": "Luang Prabang",
+     "ru": "Луангпхабанг"
+    },
+    "name": "Luang Prabang International"
+   }
+  ]
+ },
+ {
   "code": "LV",
   "name": {
    "en": "Latvia",
@@ -885,6 +1479,64 @@
   ]
  },
  {
+  "code": "LU",
+  "name": {
+   "en": "Luxembourg",
+   "ru": "Люксембург"
+  },
+  "airports": [
+   {
+    "iata": "LUX",
+    "city": {
+     "en": "Luxembourg",
+     "ru": "Люксембург"
+    },
+    "name": "Luxembourg Findel"
+   }
+  ]
+ },
+ {
+  "code": "MY",
+  "name": {
+   "en": "Malaysia",
+   "ru": "Малайзия"
+  },
+  "airports": [
+   {
+    "iata": "KUL",
+    "city": {
+     "en": "Kuala Lumpur",
+     "ru": "Куала-Лумпур"
+    },
+    "name": "Kuala Lumpur International"
+   },
+   {
+    "iata": "PEN",
+    "city": {
+     "en": "Penang",
+     "ru": "Пенанг"
+    },
+    "name": "Penang International"
+   },
+   {
+    "iata": "LGK",
+    "city": {
+     "en": "Langkawi",
+     "ru": "Лангкави"
+    },
+    "name": "Langkawi International"
+   },
+   {
+    "iata": "BKI",
+    "city": {
+     "en": "Kota Kinabalu",
+     "ru": "Кота-Кинабалу"
+    },
+    "name": "Kota Kinabalu International"
+   }
+  ]
+ },
+ {
   "code": "MT",
   "name": {
    "en": "Malta",
@@ -898,6 +1550,64 @@
      "ru": "Мальта"
     },
     "name": "Malta International"
+   }
+  ]
+ },
+ {
+  "code": "MX",
+  "name": {
+   "en": "Mexico",
+   "ru": "Мексика"
+  },
+  "airports": [
+   {
+    "iata": "MEX",
+    "city": {
+     "en": "Mexico City",
+     "ru": "Мехико"
+    },
+    "name": "Benito Juarez"
+   },
+   {
+    "iata": "CUN",
+    "city": {
+     "en": "Cancun",
+     "ru": "Канкун"
+    },
+    "name": "Cancun International"
+   },
+   {
+    "iata": "GDL",
+    "city": {
+     "en": "Guadalajara",
+     "ru": "Гвадалахара"
+    },
+    "name": "Miguel Hidalgo"
+   },
+   {
+    "iata": "SJD",
+    "city": {
+     "en": "Los Cabos",
+     "ru": "Лос-Кабос"
+    },
+    "name": "Los Cabos International"
+   }
+  ]
+ },
+ {
+  "code": "MD",
+  "name": {
+   "en": "Moldova",
+   "ru": "Молдова"
+  },
+  "airports": [
+   {
+    "iata": "RMO",
+    "city": {
+     "en": "Chisinau",
+     "ru": "Кишинёв"
+    },
+    "name": "Chisinau International"
    }
   ]
  },
@@ -952,6 +1662,23 @@
   ]
  },
  {
+  "code": "MM",
+  "name": {
+   "en": "Myanmar",
+   "ru": "Мьянма"
+  },
+  "airports": [
+   {
+    "iata": "RGN",
+    "city": {
+     "en": "Yangon",
+     "ru": "Янгон"
+    },
+    "name": "Yangon International"
+   }
+  ]
+ },
+ {
   "code": "NL",
   "name": {
    "en": "Netherlands",
@@ -981,6 +1708,165 @@
      "ru": "Роттердам"
     },
     "name": "Rotterdam The Hague"
+   }
+  ]
+ },
+ {
+  "code": "NI",
+  "name": {
+   "en": "Nicaragua",
+   "ru": "Никарагуа"
+  },
+  "airports": [
+   {
+    "iata": "MGA",
+    "city": {
+     "en": "Managua",
+     "ru": "Манагуа"
+    },
+    "name": "Augusto C. Sandino"
+   }
+  ]
+ },
+ {
+  "code": "MK",
+  "name": {
+   "en": "North Macedonia",
+   "ru": "Северная Македония"
+  },
+  "airports": [
+   {
+    "iata": "SKP",
+    "city": {
+     "en": "Skopje",
+     "ru": "Скопье"
+    },
+    "name": "Skopje International"
+   },
+   {
+    "iata": "OHD",
+    "city": {
+     "en": "Ohrid",
+     "ru": "Охрид"
+    },
+    "name": "St. Paul the Apostle"
+   }
+  ]
+ },
+ {
+  "code": "NO",
+  "name": {
+   "en": "Norway",
+   "ru": "Норвегия"
+  },
+  "airports": [
+   {
+    "iata": "OSL",
+    "city": {
+     "en": "Oslo",
+     "ru": "Осло"
+    },
+    "name": "Gardermoen"
+   },
+   {
+    "iata": "BGO",
+    "city": {
+     "en": "Bergen",
+     "ru": "Берген"
+    },
+    "name": "Flesland"
+   },
+   {
+    "iata": "TOS",
+    "city": {
+     "en": "Tromso",
+     "ru": "Тромсё"
+    },
+    "name": "Tromso Langnes"
+   }
+  ]
+ },
+ {
+  "code": "PA",
+  "name": {
+   "en": "Panama",
+   "ru": "Панама"
+  },
+  "airports": [
+   {
+    "iata": "PTY",
+    "city": {
+     "en": "Panama City",
+     "ru": "Панама"
+    },
+    "name": "Tocumen"
+   }
+  ]
+ },
+ {
+  "code": "PY",
+  "name": {
+   "en": "Paraguay",
+   "ru": "Парагвай"
+  },
+  "airports": [
+   {
+    "iata": "ASU",
+    "city": {
+     "en": "Asuncion",
+     "ru": "Асунсьон"
+    },
+    "name": "Silvio Pettirossi"
+   }
+  ]
+ },
+ {
+  "code": "PE",
+  "name": {
+   "en": "Peru",
+   "ru": "Перу"
+  },
+  "airports": [
+   {
+    "iata": "LIM",
+    "city": {
+     "en": "Lima",
+     "ru": "Лима"
+    },
+    "name": "Jorge Chavez"
+   },
+   {
+    "iata": "CUZ",
+    "city": {
+     "en": "Cusco",
+     "ru": "Куско"
+    },
+    "name": "Alejandro Velasco Astete"
+   }
+  ]
+ },
+ {
+  "code": "PH",
+  "name": {
+   "en": "Philippines",
+   "ru": "Филиппины"
+  },
+  "airports": [
+   {
+    "iata": "MNL",
+    "city": {
+     "en": "Manila",
+     "ru": "Манила"
+    },
+    "name": "Ninoy Aquino"
+   },
+   {
+    "iata": "CEB",
+    "city": {
+     "en": "Cebu",
+     "ru": "Себу"
+    },
+    "name": "Mactan-Cebu"
    }
   ]
  },
@@ -1116,6 +2002,55 @@
   ]
  },
  {
+  "code": "RU",
+  "name": {
+   "en": "Russia",
+   "ru": "Россия"
+  },
+  "airports": [
+   {
+    "iata": "SVO",
+    "city": {
+     "en": "Moscow",
+     "ru": "Москва"
+    },
+    "name": "Sheremetyevo"
+   },
+   {
+    "iata": "DME",
+    "city": {
+     "en": "Moscow",
+     "ru": "Москва"
+    },
+    "name": "Domodedovo"
+   },
+   {
+    "iata": "VKO",
+    "city": {
+     "en": "Moscow",
+     "ru": "Москва"
+    },
+    "name": "Vnukovo"
+   },
+   {
+    "iata": "LED",
+    "city": {
+     "en": "Saint Petersburg",
+     "ru": "Санкт-Петербург"
+    },
+    "name": "Pulkovo"
+   },
+   {
+    "iata": "AER",
+    "city": {
+     "en": "Sochi",
+     "ru": "Сочи"
+    },
+    "name": "Sochi International"
+   }
+  ]
+ },
+ {
   "code": "RS",
   "name": {
    "en": "Serbia",
@@ -1129,6 +2064,48 @@
      "ru": "Белград"
     },
     "name": "Nikola Tesla"
+   }
+  ]
+ },
+ {
+  "code": "SG",
+  "name": {
+   "en": "Singapore",
+   "ru": "Сингапур"
+  },
+  "airports": [
+   {
+    "iata": "SIN",
+    "city": {
+     "en": "Singapore",
+     "ru": "Сингапур"
+    },
+    "name": "Changi"
+   }
+  ]
+ },
+ {
+  "code": "SK",
+  "name": {
+   "en": "Slovakia",
+   "ru": "Словакия"
+  },
+  "airports": [
+   {
+    "iata": "BTS",
+    "city": {
+     "en": "Bratislava",
+     "ru": "Братислава"
+    },
+    "name": "M. R. Stefanik"
+   },
+   {
+    "iata": "KSC",
+    "city": {
+     "en": "Kosice",
+     "ru": "Кошице"
+    },
+    "name": "Kosice International"
    }
   ]
  },
@@ -1570,6 +2547,89 @@
      "ru": "Вашингтон"
     },
     "name": "Dulles"
+   }
+  ]
+ },
+ {
+  "code": "UY",
+  "name": {
+   "en": "Uruguay",
+   "ru": "Уругвай"
+  },
+  "airports": [
+   {
+    "iata": "MVD",
+    "city": {
+     "en": "Montevideo",
+     "ru": "Монтевидео"
+    },
+    "name": "Carrasco"
+   }
+  ]
+ },
+ {
+  "code": "VE",
+  "name": {
+   "en": "Venezuela",
+   "ru": "Венесуэла"
+  },
+  "airports": [
+   {
+    "iata": "CCS",
+    "city": {
+     "en": "Caracas",
+     "ru": "Каракас"
+    },
+    "name": "Simon Bolivar"
+   }
+  ]
+ },
+ {
+  "code": "VN",
+  "name": {
+   "en": "Vietnam",
+   "ru": "Вьетнам"
+  },
+  "airports": [
+   {
+    "iata": "SGN",
+    "city": {
+     "en": "Ho Chi Minh City",
+     "ru": "Хошимин"
+    },
+    "name": "Tan Son Nhat"
+   },
+   {
+    "iata": "HAN",
+    "city": {
+     "en": "Hanoi",
+     "ru": "Ханой"
+    },
+    "name": "Noi Bai"
+   },
+   {
+    "iata": "DAD",
+    "city": {
+     "en": "Da Nang",
+     "ru": "Дананг"
+    },
+    "name": "Da Nang International"
+   },
+   {
+    "iata": "CXR",
+    "city": {
+     "en": "Nha Trang",
+     "ru": "Нячанг"
+    },
+    "name": "Cam Ranh"
+   },
+   {
+    "iata": "PQC",
+    "city": {
+     "en": "Phu Quoc",
+     "ru": "Фукуок"
+    },
+    "name": "Phu Quoc International"
    }
   ]
  }

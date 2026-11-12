@@ -16,7 +16,7 @@ export default function Notifications() {
     <AppShell crumb={t.notifications}>
       <PageHeader title={t.notifications} sub={t.notificationsSub}
         action={<Link className="btn" href="/settings">{t.notificationSettings}</Link>} />
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
       <section className="card table-card">
         <div className="table-head"><div><h2>{t.recentNotifications}</h2></div></div>
         {logs && logs.length === 0 && (

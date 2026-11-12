@@ -11,7 +11,7 @@ export const AIRLINES: Record<string, string> = {
   VY: 'Vueling', V7: 'Volotea', HV: 'Transavia', TO: 'Transavia France', PC: 'Pegasus', '4Y': 'Discover Airlines',
   EW: 'Eurowings', DY: 'Norwegian', D8: 'Norwegian', FZ: 'flydubai', G9: 'Air Arabia', XQ: 'SunExpress', '0B': 'Blue Air',
   // Italy / Greece / Cyprus
-  AZ: 'ITA Airways', A3: 'Aegean', OA: 'Olympic Air', GQ: 'Sky Express', CY: 'Cyprus Airways', X3: 'TUIfly', BY: 'TUI Airways',
+  AZ: 'ITA Airways', A3: 'Aegean', OA: 'Olympic Air', GQ: 'Sky Express', CY: 'Cyprus Airways', U8: 'TUS Airways', X3: 'TUIfly', BY: 'TUI Airways',
   // Europe full-service
   LH: 'Lufthansa', LX: 'Swiss', OS: 'Austrian', SN: 'Brussels Airlines', WK: 'Edelweiss', EN: 'Air Dolomiti',
   AF: 'Air France', KL: 'KLM', BA: 'British Airways', IB: 'Iberia', UX: 'Air Europa', TP: 'TAP Air Portugal',
@@ -30,4 +30,26 @@ export function carrierName(code: string | undefined, providerName?: string): st
   if (providerName && LATIN.test(providerName)) return providerName;
   if (code && AIRLINES[code]) return AIRLINES[code];
   return code || undefined;
+}
+
+/** Name (lower case) → IATA code, incl. the longer spellings providers use. */
+const CODE_BY_NAME: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(AIRLINES).map(([code, name]) => [name.toLowerCase(), code])),
+  'el al israel airlines': 'LY', 'israir airlines': '6H', 'aegean airlines': 'A3', ita: 'AZ',
+};
+
+const IATA_FLIGHT = /^([A-Z][A-Z0-9]|[0-9][A-Z])\d{1,4}[A-Z]?$/;
+
+/**
+ * Flight number with an IATA airline designator. Skyscanner uses its own 2-character codes for some
+ * carriers ("I*6044" = Wizz Air Malta W4, "9_132" = Blue Bird BZ, "@6132" = TUS U8): the designator
+ * is then taken from the carrier's name. Unknown ones stay as they came.
+ */
+export function iataFlightNumber(raw: string | undefined, carrier?: string): string | undefined {
+  if (!raw) return undefined;
+  const s = raw.replace(/\s+/g, '');
+  if (IATA_FLIGHT.test(s)) return s;
+  const code = carrier ? CODE_BY_NAME[carrier.toLowerCase()] : undefined;
+  const num = s.slice(2);
+  return code && /^\d{1,4}[A-Z]?$/.test(num) ? `${code}${num}` : s;
 }

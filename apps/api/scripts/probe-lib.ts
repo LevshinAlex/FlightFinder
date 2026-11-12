@@ -69,7 +69,9 @@ export function planIndicativeCalls(provider: string, airports: string[], combos
 /** API host → provider, for the hard per-provider request cap. */
 const HOSTS: Record<string, string> = {
   'api.travelpayouts.com': 'travelpayouts', 'ignav.com': 'ignav', 'serpapi.com': 'serpapi',
-  'api.hasdata.com': 'hasdata', 'api.duffel.com': 'duffel',
+  'api.hasdata.com': 'hasdata', 'api.duffel.com': 'duffel', 'kiwi-com-flights-api.p.rapidapi.com': 'kiwi',
+  'google-flights-live-api.p.rapidapi.com': 'flightpowers',
+  'skyscanner-scraper-1000-free-calls.p.rapidapi.com': 'skyscanner_scraper',
 };
 
 /**

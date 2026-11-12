@@ -27,12 +27,17 @@ export class UsersController {
   }
 
   @Put('profile')
+  /**
+   * WhatsApp opt-in states: no phone → phone → consented → (settings) enabled.
+   * Consent belongs to ONE number: it is given explicitly, and lost when the number changes or is removed.
+   */
   async update(@CurrentUser() userId: string, @Body() dto: ProfileDto) {
-    const phoneChanged = dto.phone !== undefined;
-    const data: any = { name: dto.name, locale: dto.locale, timezone: dto.timezone };
-    if (phoneChanged) data.phone = dto.phone || null;
-    if (dto.whatsappConsent === true && (dto.phone || (await this.prisma.user.findUnique({ where: { id: userId } }))?.phone)) data.whatsappConsentAt = new Date();
-    if (dto.whatsappConsent === false || (phoneChanged && !dto.phone)) {
+    const current = await this.prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { phone: true } });
+    const phone = dto.phone === undefined ? current.phone : dto.phone || null;
+    const data: any = { name: dto.name, locale: dto.locale, timezone: dto.timezone, phone };
+    if (dto.whatsappConsent === true && phone) {
+      data.whatsappConsentAt = new Date();
+    } else if (dto.whatsappConsent === false || !phone || phone !== current.phone) {
       data.whatsappConsentAt = null;
       await this.prisma.notificationPreference.updateMany({ where: { userId }, data: { whatsappEnabled: false } });
     }

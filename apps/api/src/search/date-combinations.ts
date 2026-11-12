@@ -1,4 +1,4 @@
-import { addDays } from '../common/dates';
+import { addDays, toIsoDate } from '../common/dates';
 
 export type FlexMode = 'PLUS' | 'MINUS' | 'BOTH';
 
@@ -44,4 +44,27 @@ export function buildDateCombinations(
     }
   }
   return combos;
+}
+
+export interface TrackerDates {
+  departureDate: Date; departureFlexDays: number; departureFlexMode: FlexMode;
+  returnDate: Date; returnFlexDays: number; returnFlexMode: FlexMode;
+}
+
+/** The date combinations a stored tracker can still be searched for, as of `today` (UTC, YYYY-MM-DD). */
+export function trackerDateCombinations(t: TrackerDates, today = toIsoDate(new Date())): DateCombination[] {
+  return buildDateCombinations(
+    { date: toIsoDate(t.departureDate), flexDays: t.departureFlexDays, mode: t.departureFlexMode },
+    { date: toIsoDate(t.returnDate), flexDays: t.returnFlexDays, mode: t.returnFlexMode },
+    today,
+  );
+}
+
+/**
+ * Implicit tracker state "trip dates passed": every departure option is in the past, so there is
+ * nothing left to search. Such a tracker is never searched, reported or offered a manual check –
+ * a search would only produce a misleading "provider unavailable" failure.
+ */
+export function hasSearchableDates(t: TrackerDates, today = toIsoDate(new Date())): boolean {
+  return trackerDateCombinations(t, today).length > 0;
 }

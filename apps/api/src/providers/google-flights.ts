@@ -1,4 +1,4 @@
-import { FlightSegment, ProviderOffer, SearchCriteria } from './flight-provider.interface';
+import { FlightSegment, PriceInsight, ProviderOffer, SearchCriteria } from './flight-provider.interface';
 
 /** Shared helpers for Google Flights scrapers (SerpApi, HasData). */
 
@@ -43,6 +43,30 @@ const items = (json: any): any[] => [
 const num = (v: any): number | undefined => (v == null || isNaN(Number(v)) ? undefined : Number(v));
 
 /**
+ * Google's price insight of the search, on the first (outbound) page – no extra request.
+ * SerpApi `price_insights` / HasData `priceInsights`: price_level, typical_price_range [low, high],
+ * price_history [[unix seconds, price], …]; prices in the requested currency.
+ */
+export function priceInsight(json: any): PriceInsight | undefined {
+  const pi = json?.price_insights ?? json?.priceInsights;
+  if (!pi || typeof pi !== 'object') return undefined;
+  const level = String(pi.price_level ?? pi.priceLevel ?? '').toLowerCase();
+  const range = pi.typical_price_range ?? pi.typicalPriceRange;
+  const hist = pi.price_history ?? pi.priceHistory;
+  const history = Array.isArray(hist)
+    ? hist.filter((h: any) => Array.isArray(h) && num(h[0]) && num(h[1]) !== undefined)
+      .map((h: any) => [Number(h[0]) < 1e12 ? Number(h[0]) * 1000 : Number(h[0]), Number(h[1])] as [number, number])
+    : undefined;
+  const out: PriceInsight = {
+    level: level === 'low' || level === 'typical' || level === 'high' ? level : undefined,
+    typicalLow: Array.isArray(range) ? num(range[0]) : undefined,
+    typicalHigh: Array.isArray(range) ? num(range[1]) : undefined,
+    history: history?.length ? history : undefined,
+  };
+  return out.level || out.typicalLow != null || out.history ? out : undefined;
+}
+
+/**
  * Google Flights round trips are two-step: the first page lists OUTBOUND legs (price = cheapest
  * round-trip total starting with that leg); the return legs of one outbound come from a second
  * request with its departure token. We resolve only the cheapest outbound – so every offer we
@@ -55,7 +79,9 @@ export async function resolveGoogleRoundTrip(
   c: SearchCriteria,
   fetchPage: (departureToken?: string) => Promise<any>,
 ): Promise<ProviderOffer[]> {
-  const outbound = items(await fetchPage())
+  const first = await fetchPage();
+  const insight = priceInsight(first);
+  const outbound = items(first)
     .filter((i) => num(i.price) !== undefined && (i.departure_token ?? i.departureToken))
     .filter((i) => (i.flights?.length ?? 1) - 1 <= c.maxStops)
     .sort((a, b) => Number(a.price) - Number(b.price));
@@ -88,6 +114,7 @@ export async function resolveGoogleRoundTrip(
         currency: c.currency.toUpperCase(),
         selfTransfer: looksSelfTransfer(out) || looksSelfTransfer(r),
         bookingUrl: link,
+        priceInsight: insight,
         // Scraped from Google Flights at request time – a current fare, but not a bookable confirmation
         priceStatus: 'LIVE',
         observedAt,
@@ -102,6 +129,7 @@ export async function resolveGoogleRoundTrip(
  */
 export function outboundOnlyOffers(provider: string, c: SearchCriteria, json: any): ProviderOffer[] {
   const observedAt = new Date().toISOString();
+  const insight = priceInsight(json);
   return items(json)
     .filter((i) => num(i.price) !== undefined)
     .map((i): ProviderOffer => {
@@ -122,6 +150,7 @@ export function outboundOnlyOffers(provider: string, c: SearchCriteria, json: an
         selfTransfer: looksSelfTransfer(i),
         priceStatus: 'LIVE',
         rankingOnly: true,
+        priceInsight: insight,
         observedAt,
       };
     });

@@ -10,6 +10,8 @@
   --hero-1: #0f2350; --hero-2: #1d4ed8; --radius: 16px; --sidebar: 250px;
   --btn-1: #3b82f6; --btn-2: #2563eb;
   --font: var(--font-ui, "Manrope"), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* native date pickers, selects and scrollbars follow the theme */
+  color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -26,10 +28,18 @@
 /* ===== Base ===== */
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+/* the sticky top bar must not cover a focused field; no double-tap zoom delay on touch */
+html { scroll-padding-top: 96px; touch-action: manipulation; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
-h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.02em; margin: 0 0 6px; font-weight: 800; }
-h2 { font-size: 18px; margin: 28px 0 12px; font-weight: 800; letter-spacing: -.01em; }
+h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.02em; margin: 0 0 6px; font-weight: 800; text-wrap: balance; }
+h2 { font-size: 18px; margin: 28px 0 12px; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 100; padding: 10px 16px; border-radius: 10px; background: var(--primary); color: #fff; font-weight: 700; }
+.skip-link:focus { top: 12px; text-decoration: none; }
+/* <main> only receives focus from the skip link – the next Tab continues inside it; no frame around the whole page */
+main:focus { outline: none; }
+.field-error { color: var(--up); font-size: 12.5px; font-weight: 600; }
 p { margin: 0; }
 small { display: block; font-size: 12px; }
 .muted { color: var(--muted); }
@@ -101,6 +111,8 @@ small { display: block; font-size: 12px; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
 .service-ok { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
 .service-ok i { width: 8px; height: 8px; border-radius: 50%; background: var(--down); box-shadow: 0 0 0 3px var(--down-soft); }
+.service-ok.down { color: var(--up); }
+.service-ok.down i { background: var(--up); box-shadow: 0 0 0 3px var(--up-soft); }
 .icon-btn {
   display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; border: 0;
   background: transparent; color: var(--muted); cursor: pointer;
@@ -143,10 +155,14 @@ input, select, textarea {
   border-radius: 12px; padding: 10px 12px; width: 100%;
 }
 input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+/* read-only values (currency USD, account email) must not look editable */
+input:disabled, select:disabled { background: var(--chip); color: var(--muted); cursor: not-allowed; }
 input[type=checkbox] { width: auto; accent-color: var(--primary); }
-label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
 .check { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--text); }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px 20px; }
+/* destination airports: a full-width row of the form grid, right under the destination country */
+.dest-airports { grid-column: 1 / -1; margin-bottom: 4px; }
 .airport-list { display: flex; flex-wrap: wrap; gap: 6px 16px; max-height: 180px; overflow: auto; padding: 12px; border: 1px solid var(--border); border-radius: 12px; }
 
 /* ===== Cards ===== */
@@ -256,7 +272,9 @@ table.trackers tbody tr:hover { background: var(--surface-2); }
 /* tabs (tracker page) */
 .tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
 .tabs button { border: 0; background: none; color: var(--muted); padding: 7px 14px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
-.tabs button.on { background: var(--primary); color: #fff; }
+.tabs button:hover { color: var(--text); background: var(--surface-2); }
+/* --primary-ink: white in light theme, dark ink on the lighter dark-theme blue (readable contrast) */
+.tabs button.on { background: var(--primary); color: var(--primary-ink); }
 
 /* ===== Auth pages (no shell) ===== */
 .auth { max-width: 420px; margin: 8vh auto; padding: 0 16px; }
@@ -271,8 +289,9 @@ table.trackers tbody tr:hover { background: var(--surface-2); }
 }
 @media (max-width: 960px) {
   .only-mobile { display: inline-grid; }
-  .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); transition: transform .2s ease; box-shadow: none; }
-  .nav-open .sidebar { transform: none; box-shadow: 0 0 40px rgba(0, 0, 0, .2); }
+  /* closed drawer: off-screen AND out of the tab order / screen reader (visibility switches after the slide) */
+  .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); visibility: hidden; transition: transform .2s ease, visibility 0s linear .2s; box-shadow: none; }
+  .nav-open .sidebar { transform: none; visibility: visible; transition: transform .2s ease; box-shadow: 0 0 40px rgba(0, 0, 0, .2); }
   .nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(15, 27, 51, .35); z-index: 25; }
   .sidebar-head { margin-bottom: 32px; }
   .topbar { padding: 0 20px; height: 68px; gap: 10px; }
@@ -314,6 +333,11 @@ table.trackers tbody tr:hover { background: var(--surface-2); }
   table.trackers td.empty { grid-column: 1 / -1; padding: 28px 0 !important; }
   table.trackers tr:has(td.empty) { display: block; }
   .table-foot { padding: 14px 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+  .sidebar, .nav-open .sidebar { transition: none; }
 }
 
 /* spacing fixes */

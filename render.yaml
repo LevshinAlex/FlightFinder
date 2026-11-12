@@ -43,6 +43,10 @@ services:
         value: "3"
       - key: LIVE_AIRPORT_PROBES
         value: "false"
+      - key: RAPIDAPI_KEY          # optional: Kiwi.com Flights API (free BASIC plan) – then add kiwi to LIVE_PROVIDER
+        sync: false
+      - key: BASE_CURRENCY
+        value: USD
       - key: EMAIL_TRANSPORT
         value: console
 

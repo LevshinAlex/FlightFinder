@@ -28,6 +28,8 @@ async function main() {
   const trackers = await prisma.flightTracker.findMany({ where: { status: 'ACTIVE' }, select: { id: true } });
   const ids = trackers.map((t) => t.id);
   await prisma.searchRun.deleteMany({ where: { trackerId: { in: ids } } }); // cascades offers & snapshots
+  // backdated runs must be comparable with today's (prices are compared only since criteriaUpdatedAt)
+  await prisma.flightTracker.updateMany({ where: { id: { in: ids } }, data: { criteriaUpdatedAt: new Date(Date.now() - (days + 1) * 86400e3) } });
   for (let d = days; d >= 1; d--) {
     const when = new Date(Date.now() - d * 86400e3);
     process.env.MOCK_TODAY = when.toISOString().slice(0, 10);
